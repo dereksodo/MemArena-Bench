@@ -11,7 +11,8 @@
 # Single-GPU servers use TP=1, DP=1. Multi-GPU servers use pure data
 # parallelism, so TP stays 1 and DP equals the number of visible GPUs.
 # All servers use context length 16384, static memory fraction 0.85, and
-# max running requests 64 unless overridden by environment variables below.
+# max running requests 128 unless overridden by environment variables below.
+# Per-tag GPUs and ports can be overridden, e.g. SGLANG_GPUS_8b=6 SGLANG_PORT_8b=31606.
 
 set -euo pipefail
 
@@ -32,7 +33,7 @@ if [[ -z "${SGLANG_32B_AWQ_PIP_INSTALL+x}" ]]; then
 fi
 SHM_SIZE="${SHM_SIZE:-32g}"
 PULL_IMAGE="${PULL_IMAGE:-auto}"          # auto | always | never
-REPLACE_EXISTING="${REPLACE_EXISTING:-1}" # 1 removes same-name containers first
+REPLACE_EXISTING="${REPLACE_EXISTING:-0}" # 1 removes same-name containers first
 WAIT_READY="${WAIT_READY:-1}"             # 1 waits for /v1/models after launch
 READY_TIMEOUT="${READY_TIMEOUT:-900}"
 POLL_INTERVAL="${POLL_INTERVAL:-2}"
@@ -43,11 +44,18 @@ HF_CACHE_DIR="${HF_CACHE_DIR/#\~/$HOME}"
 
 MODEL_SPECS=(
   "0_6b|Qwen/Qwen3-0.6B|/models/0_6b|16000|0"
-  "llama3b|meta-llama/Llama-3.2-3B-Instruct|/models/llama3b|16001|0,1,2,3,4,5,6,7"
+  "llama3b|meta-llama/Llama-3.2-3B-Instruct|/models/llama3b|16001|1"
   "7b|mistralai/Mistral-7B-Instruct-v0.3|/models/7b|16002|2,3"
   "8b|Qwen/Qwen3-8B|/models/8b|16003|4,5"
   "32b|Qwen/Qwen3-32B-AWQ|/models/32b|16004|6,7"
 )
+# Per-tag overrides: SGLANG_GPUS_<tag> (comma-separated GPU ids) and SGLANG_PORT_<tag>.
+for i in "${!MODEL_SPECS[@]}"; do
+  IFS='|' read -r tag served_model container_model_path port gpus <<<"${MODEL_SPECS[$i]}"
+  gpus_var="SGLANG_GPUS_${tag}"
+  port_var="SGLANG_PORT_${tag}"
+  MODEL_SPECS[$i]="${tag}|${served_model}|${container_model_path}|${!port_var:-$port}|${!gpus_var:-$gpus}"
+done
 
 usage() {
   cat <<'EOF'
@@ -64,7 +72,7 @@ Environment overrides:
   SGLANG_MEM_FRACTION_STATIC
                           Passed as --mem-fraction-static. Default: 0.85
   SGLANG_MAX_RUNNING_REQUESTS
-                          Passed as --max-running-requests. Default: 64
+                          Passed as --max-running-requests. Default: 128
   SGLANG_PIP_INSTALL      Python packages installed inside the container before
                           launch. Default: protobuf sentencepiece
                           Set to an empty string to skip.
@@ -73,7 +81,9 @@ Environment overrides:
                           container. Default: vllm==0.7.2
                           Set to an empty string to skip.
   PULL_IMAGE              auto, always, or never. Default: auto
-  REPLACE_EXISTING        Remove same-name containers before start. Default: 1
+  SGLANG_GPUS_<tag>       GPUs for one model, e.g. SGLANG_GPUS_8b=6 (DP = number of GPUs)
+  SGLANG_PORT_<tag>       Port for one model, e.g. SGLANG_PORT_8b=31606
+  REPLACE_EXISTING        Remove same-name containers before start. Default: 0
   WAIT_READY              Wait for /v1/models after launch. Default: 1
   READY_TIMEOUT           Readiness timeout in seconds. Default: 900
   DOCKER_RESTART_POLICY   Docker restart policy. Default: no

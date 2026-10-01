@@ -68,7 +68,7 @@ scripts/setup_venv.sh && source scripts/activate_venv.sh
 python scripts/verify_install.py
 ```
 
-Judging uses `openai/gpt-4o-mini-2024-07-18` through OpenRouter; put `OPENROUTER_API_KEY` in
+Python 3.10–3.12 (tested in CI). Judging uses `openai/gpt-4o-mini-2024-07-18` through OpenRouter; put `OPENROUTER_API_KEY` in
 `.env` (see [`.env.example`](.env.example)).
 
 ## Quick start
@@ -77,7 +77,7 @@ A smoke test that needs no GPU, services or API keys:
 
 ```bash
 python run_masim.py --smoke --output out/smoke/masim --overwrite
-python scripts/run_accuracy.py --dry-run --backend vanilla --n 10 --out-dir out/smoke/accuracy
+python scripts/run_accuracy.py --dry-run --backend vanilla --n 10 --out-dir out/smoke/accuracy   # stub answers: accuracy 0.000 is expected
 python -m pytest tests -q
 ```
 

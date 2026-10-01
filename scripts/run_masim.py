@@ -54,8 +54,10 @@ def _load_yaml_with_base(path: Path) -> dict[str, Any]:
         return data
 
     base_path = (path.parent / str(base_name)).resolve()
+    if not base_path.exists():  # a config copied out of the repo still finds its base
+        base_path = (REPO_ROOT / "MASim" / "configs" / str(base_name)).resolve()
     if not base_path.exists():
-        raise FileNotFoundError(f"Config base file not found: {base_path}")
+        raise FileNotFoundError(f"Config base file not found: {base_name} (next to {path} or in MASim/configs/)")
     return _deep_merge(_load_yaml_with_base(base_path), data)
 
 
@@ -294,6 +296,8 @@ def _run_smoke(args: argparse.Namespace, output_dir: Path, timestamp: str) -> in
     dry_run = bool(args.dry_run or not args.smoke_real)
     _prepare_output_dir(output_dir, overwrite=args.overwrite)
 
+    args.agents = args.agents or 2
+    args.days = args.days or 1
     print(f"[run-masim] smoke=1 dry_run={dry_run} agents={args.agents} days={args.days}", flush=True)
     print(f"[run-masim] output={output_dir}", flush=True)
     t0 = time.time()
@@ -356,8 +360,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--smoke", action="store_true", help="Run the toy MASim smoke pipeline instead of full MASim")
     parser.add_argument("--smoke-real", action="store_true", help="In --smoke mode, call OpenAI instead of deterministic stubs")
-    parser.add_argument("--agents", type=int, default=2, help="--smoke only: number of toy agents")
-    parser.add_argument("--days", type=int, default=1, help="--smoke only: number of toy days")
+    parser.add_argument("--agents", type=int, default=None,
+                        help="--smoke only: number of toy agents (default 2). For a real world set graph.n_agents "
+                             "and graph.layers in the config, e.g. MASim/configs/memarena_5a10d_5k.yaml")
+    parser.add_argument("--days", type=int, default=None,
+                        help="Number of simulated days: sets time_range to [0, DAYS] (with --smoke: toy days, default 1)")
     parser.add_argument("--model", default=None, help="Override config.llm.model")
     parser.add_argument("--api-key", default="EMPTY", help="Override config.llm.api_key")
     parser.add_argument("--concurrency", type=int, default=None, help="Override config.llm.concurrency")
@@ -388,11 +395,19 @@ def main(argv: list[str] | None = None) -> int:
     if not config_path.exists():
         raise SystemExit(f"Config not found: {config_path}")
 
+    if args.agents is not None:
+        raise SystemExit("--agents applies to --smoke only: the social graph's layer sizes depend on the agent "
+                         "count, so set graph.n_agents and graph.layers in the config "
+                         "(see MASim/configs/memarena_5a10d_5k.yaml)")
+    # load the config before --overwrite clears the output directory, so a bad config loses nothing
+    effective_config = _load_yaml_with_base(config_path)
+    if args.days is not None:
+        effective_config["time_range"] = [0.0, float(args.days)]
+        print(f"[run-masim] --days {args.days}: time_range = [0.0, {float(args.days)}]", flush=True)
+    api_base = _normalise_sglang_url(args.sglang_url)
+
     output_dir = (_resolve_repo_path(args.output) if args.output else _default_output_dir(config_path, timestamp))
     _prepare_output_dir(output_dir, overwrite=args.overwrite)
-
-    effective_config = _load_yaml_with_base(config_path)
-    api_base = _normalise_sglang_url(args.sglang_url)
 
     models_payload: dict[str, Any] = {"data": []}
     if args.dry_run:

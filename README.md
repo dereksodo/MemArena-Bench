@@ -8,7 +8,7 @@
   <a href="docs/LICENSE"><img src="https://img.shields.io/badge/data-CC%20BY%204.0-lightgrey" alt="Data license"></a>
 </p>
 
-<p align="center"><b>Jiadong Zhang</b> and <b>Xiaosong Ma</b><br>MBZUAI</p>
+<p align="center"><a href="https://dereksodo.github.io"><b>Jiadong Zhang</b></a> and <b>Xiaosong Ma</b><br>MBZUAI</p>
 
 <p align="center"><img src="docs/assets/overview.png" width="95%" alt="MemArena overview"></p>
 
@@ -31,11 +31,11 @@ Oracle).
 1. **The memory backend matters more than reader scale for content accuracy.** At Qwen3-8B,
    switching from Memobase to MemSearch gains +22.1 / +21.2 pp in recall / reasoning; scaling the
    reader to Qwen3-32B-AWQ gains at most +3.5 / +4.4 pp under either backend.
-2. **Permission-aware access fails universally.** Given the evidence, Oracle readers disclose the
-   protected fact to requesters who should not receive it in 75–99% of cases; the deployable
-   backends mostly fail to surface the fact at all.
+2. **Permission-aware access fails in two distinct modes.** Given the evidence, Oracle readers
+   disclose the protected fact to requesters who should not receive it in 75–99% of cases; the
+   deployable backends mostly fail to surface the fact at all.
 3. **Memory search adds little latency.** On a Spark GB10 edge node, search costs a fixed
-   87 / 8 / 51 ms (BM25-RAG / Memobase / MemSearch), which matters only for the smallest reader.
+   87 / 8 / 51 ms (BM25-RAG / Memobase / MemSearch), which matters only for small readers.
 
 ## Dataset
 

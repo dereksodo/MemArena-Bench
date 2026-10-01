@@ -132,7 +132,7 @@
       "@type": "cr:FileObject",
       "@id": "agents_personas.jsonl.gz",
       "name": "agents_personas.jsonl.gz",
-      "contentUrl": "agents_personas.jsonl.gz",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/agents_personas.jsonl.gz",
       "encodingFormat": "application/gzip",
       "sha256": "7cb25a07ad9cab168dc8646686ed3e063046e6ec2fbaa1bb2b40796daa872509"
     },
@@ -140,7 +140,7 @@
       "@type": "cr:FileObject",
       "@id": "agent_schedules.jsonl.gz",
       "name": "agent_schedules.jsonl.gz",
-      "contentUrl": "agent_schedules.jsonl.gz",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/agent_schedules.jsonl.gz",
       "encodingFormat": "application/gzip",
       "sha256": "eb5e7a38b1cf0b08791f9558ef08c88fe3da3a877ac89703d770c18ff6d9a54a"
     },
@@ -148,7 +148,7 @@
       "@type": "cr:FileObject",
       "@id": "corpus_sessions.jsonl.gz",
       "name": "corpus_sessions.jsonl.gz",
-      "contentUrl": "corpus_sessions.jsonl.gz",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/corpus_sessions.jsonl.gz",
       "encodingFormat": "application/gzip",
       "sha256": "f9c373ed1f52f09e4d1f3690603092154bd0ddfbdeda6bee9d6699ef757c2c8b"
     },
@@ -156,7 +156,7 @@
       "@type": "cr:FileObject",
       "@id": "events.jsonl",
       "name": "events.jsonl",
-      "contentUrl": "events.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/events.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "d60a1077e58fbfab6b25095bcb026e35e198575a994e176460a85f583dd4f7b2"
     },
@@ -164,7 +164,7 @@
       "@type": "cr:FileObject",
       "@id": "groups.json",
       "name": "groups.json",
-      "contentUrl": "groups.json",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/groups.json",
       "encodingFormat": "application/json",
       "sha256": "1b84905f1ad0f30a1a71e54d0fdb95811db8aa6c43b2a657ee7e14af0c40943e"
     },
@@ -172,7 +172,7 @@
       "@type": "cr:FileObject",
       "@id": "locations.json",
       "name": "locations.json",
-      "contentUrl": "locations.json",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/locations.json",
       "encodingFormat": "application/json",
       "sha256": "31b639916075732a81d63f5d85054e3213a4a8c70e3e4fec4cc0c69f5867c546"
     },
@@ -180,7 +180,7 @@
       "@type": "cr:FileObject",
       "@id": "graph_edges.jsonl",
       "name": "graph_edges.jsonl",
-      "contentUrl": "graph_edges.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/graph_edges.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "ba022ada09cfe817cba51fee6e6928a28e3dc075a748f19e237e59ceeff240cf"
     },
@@ -188,7 +188,7 @@
       "@type": "cr:FileObject",
       "@id": "ego_projections.json",
       "name": "ego_projections.json",
-      "contentUrl": "ego_projections.json",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/ego_projections.json",
       "encodingFormat": "application/json",
       "sha256": "4eb53e971a04c419e9de4adf7f0db74a6d9cd2e21e9242218b508e901db3d90f"
     },
@@ -196,7 +196,7 @@
       "@type": "cr:FileObject",
       "@id": "ego_session_map.json",
       "name": "ego_session_map.json",
-      "contentUrl": "ego_session_map.json",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/ego_session_map.json",
       "encodingFormat": "application/json",
       "sha256": "8165ab65912221e794bf9cb683cdded8ef30a19568451fa2b6db2f0d9d8311f5"
     },
@@ -204,7 +204,7 @@
       "@type": "cr:FileObject",
       "@id": "day_checkpoint.json",
       "name": "day_checkpoint.json",
-      "contentUrl": "day_checkpoint.json",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/day_checkpoint.json",
       "encodingFormat": "application/json",
       "sha256": "ee68b1b92c059e96ee85ab6ff8ff96757044531794a745e123a193a7143f2654"
     },
@@ -212,7 +212,7 @@
       "@type": "cr:FileObject",
       "@id": "pipeline_report.json",
       "name": "pipeline_report.json",
-      "contentUrl": "pipeline_report.json",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/pipeline_report.json",
       "encodingFormat": "application/json",
       "sha256": "6d1b8f6d746a163e5396a2435607c1303eb2b67aa587420a30547419c9be6803"
     },
@@ -220,7 +220,7 @@
       "@type": "cr:FileObject",
       "@id": "eval_instances/d1_conflict.jsonl",
       "name": "eval_instances/d1_conflict.jsonl",
-      "contentUrl": "eval_instances/d1_conflict.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/eval_instances/d1_conflict.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "f108a43b0f09caf25735472178fc7b0004160cb93fa8e83282d211b8414e66d6"
     },
@@ -228,7 +228,7 @@
       "@type": "cr:FileObject",
       "@id": "eval_instances/d2_anaphora.jsonl",
       "name": "eval_instances/d2_anaphora.jsonl",
-      "contentUrl": "eval_instances/d2_anaphora.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/eval_instances/d2_anaphora.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "eeebccae2223abafebc388c5eb44bd816aa92c924055e179d93ec2ff69efab13"
     },
@@ -236,7 +236,7 @@
       "@type": "cr:FileObject",
       "@id": "eval_instances/d3_confabulation.jsonl",
       "name": "eval_instances/d3_confabulation.jsonl",
-      "contentUrl": "eval_instances/d3_confabulation.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/eval_instances/d3_confabulation.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "b8b890c4d851a583bcada5d619d2135f31308904c48cecc8d970b2577638c18a"
     },
@@ -244,7 +244,7 @@
       "@type": "cr:FileObject",
       "@id": "eval_instances/d4_permission.jsonl",
       "name": "eval_instances/d4_permission.jsonl",
-      "contentUrl": "eval_instances/d4_permission.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/eval_instances/d4_permission.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "f1e5d0dbb8b3629112f9444a2db8827ba2e2a81af431f45aef4fccbde6f68488"
     },
@@ -252,7 +252,7 @@
       "@type": "cr:FileObject",
       "@id": "eval_instances/d5_cloze.jsonl",
       "name": "eval_instances/d5_cloze.jsonl",
-      "contentUrl": "eval_instances/d5_cloze.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/eval_instances/d5_cloze.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "1616aacedc8ccc7096c3a4d105991d788fda02e78f82815c39e6d67a3405b420"
     },
@@ -260,7 +260,7 @@
       "@type": "cr:FileObject",
       "@id": "eval_instances/d6_metadata.jsonl",
       "name": "eval_instances/d6_metadata.jsonl",
-      "contentUrl": "eval_instances/d6_metadata.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/eval_instances/d6_metadata.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "6ed5437b8404aae220670767135765c5b8bfb424a6fe899859202ff20e23da27"
     },
@@ -268,7 +268,7 @@
       "@type": "cr:FileObject",
       "@id": "eval_instances/d7_qa.jsonl",
       "name": "eval_instances/d7_qa.jsonl",
-      "contentUrl": "eval_instances/d7_qa.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/eval_instances/d7_qa.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "a609518e3bd0607d39e5cdcac426d3badd32d2991d1febff75b7c1ca3d3c0d1c"
     },
@@ -276,7 +276,7 @@
       "@type": "cr:FileObject",
       "@id": "eval_instances/d8_temporal.jsonl",
       "name": "eval_instances/d8_temporal.jsonl",
-      "contentUrl": "eval_instances/d8_temporal.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/eval_instances/d8_temporal.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "3caebe975ad8cea325c1fffb8ef1710cc48d1bdcede97c9a73676dad1c531f58"
     },
@@ -284,7 +284,7 @@
       "@type": "cr:FileObject",
       "@id": "eval_instances/d10_counterfactual.jsonl",
       "name": "eval_instances/d10_counterfactual.jsonl",
-      "contentUrl": "eval_instances/d10_counterfactual.jsonl",
+      "contentUrl": "https://huggingface.co/datasets/dereksodo/memarena-l/resolve/main/eval_instances/d10_counterfactual.jsonl",
       "encodingFormat": "application/jsonlines",
       "sha256": "d47ca9a6de296ab7f3f5a7b518671827076da998cbc574596a2de5de6d6608c3"
     }

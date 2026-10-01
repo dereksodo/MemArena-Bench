@@ -1,0 +1,26 @@
+# Qwen3-TTS speech synthesis server
+# DGX Spark: single GPU (unified memory)
+#
+# Usage:
+#   python serve_qwentts.py --config MASim/configs/serve_qwentts.yaml
+#   (or launched via launch_media_servers.sh which reads this file)
+
+server:
+  host: "0.0.0.0"
+  port: 8200
+  log_level: "info"
+
+model:
+  path: "~/models/qwentts"
+  dtype: "bfloat16"
+  # Enable flash-attention-2 for faster inference
+  attn_implementation: "flash_attention_2"
+
+inference:
+  # Default voice / language settings
+  speaker: "Vivian"
+  language: "Auto"
+
+gpu:
+  device_id: 0            # DGX Spark single GPU
+  memory_fraction: 1.0    # use entire card

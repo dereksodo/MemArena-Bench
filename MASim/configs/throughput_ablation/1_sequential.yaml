@@ -1,0 +1,33 @@
+# Throughput ablation: Sequential baseline (MemArena-L)
+# Only the 3 engineering toggles differ across configs.
+base: ../memarena_l.yaml
+
+llm:
+  endpoint: "http://127.0.0.1:8000/v1"
+  api_key: "EMPTY"
+  model: "qwen3"
+  concurrency: 1
+  timeout_seconds: 300
+
+facets_enabled: false
+day_completion_ratio: 1.0
+
+conflict_inject_prob: 0.08
+max_conflicts: 20
+permission_inject_prob: 0.15
+max_permissions: 3
+autonomous_privacy_inject_prob: 0.10
+max_autonomous_privacy: 2
+max_instances_per_dim: 200
+
+person_agent:
+  enabled: true
+  ratio: 1.0
+  activity_reflection_probe_split: [0.333, 0.334, 0.333]
+
+hardening:
+  max_instances_per_dim: 200
+
+multimodal:
+  enable_image: false
+  enable_audio: false

@@ -1,0 +1,8 @@
+# Erdős-Rényi random graph (ablation baseline)
+# Uniform random edges with no community structure.
+
+graph:
+  n_agents: 50
+  model: erdos_renyi
+  seed: 42
+  er_p: 0.1    # edge probability

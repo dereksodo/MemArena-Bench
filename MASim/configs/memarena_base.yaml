@@ -1,0 +1,70 @@
+# MemArena base configuration — shared interaction parameters for MemArena-L.
+# The release keeps a single public scale; memarena_l.yaml supplies the graph,
+# number of agents, number of days, and event count.
+#
+# Target: ~10K corpus tokens / person / day.
+# Estimated: 15 sess/day/agent × 3-6 sentence turns × 8 turns ≈ ~10K tok/person/day.
+
+llm:
+  endpoint: "http://127.0.0.1:8000/v1"
+  api_key: "EMPTY"
+  model: "qwen3"
+  temperature: 0.7
+  max_tokens: 512
+  timeout_seconds: 300
+  max_retries: 2
+  concurrency: 32
+  unlimited_tokens: true
+
+sessions_per_day_per_agent: 15
+max_turns_per_session: 12
+min_turns_per_session: 4
+no_token_limit: true
+day_length: 1.0
+seed: 42
+
+modality_weights:
+  face_to_face: 0.85
+  voice_message: 0.05
+  text_message: 0.10
+
+pp_day_proportions:
+  facet_routine: 0.40
+  event_triggered: 0.15
+  encounter: 0.25
+  remote: 0.20
+pa_day_ratio_range: [1.5, 2.0]
+
+conflict_inject_prob: 0.08
+max_conflicts: null
+permission_inject_prob: 0.15
+max_permissions: null
+autonomous_privacy_inject_prob: 0.10
+max_autonomous_privacy: null
+max_instances_per_dim: 200
+
+hardening:
+  paraphrase_enabled: true
+  temporal_enabled: true
+  perspective_enabled: true
+  counterfactual_enabled: true
+  max_instances_per_dim: 200
+  max_lexical_overlap: 0.3
+
+person_agent:
+  enabled: true
+  ratio: 1.0
+  activity_reflection_probe_split: [0.333, 0.334, 0.333]
+  max_turns: 12
+  min_turns: 5
+  probe_max_turns: 8
+  probe_min_turns: 4
+
+dry_run: false
+log_level: INFO
+facets_enabled: true
+day_completion_ratio: 1.0
+
+multimodal:
+  enable_image: false
+  enable_audio: false

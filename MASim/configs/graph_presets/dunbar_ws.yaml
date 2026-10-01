@@ -1,0 +1,25 @@
+# Dunbar-layered Watts-Strogatz graph (default)
+# Implements the paper's Dunbar social structure with small-world properties.
+
+graph:
+  n_agents: 50
+  model: watts_strogatz
+  seed: 42
+  alpha: 0.33
+  layers:
+    - size: 5
+      beta: 0.30
+      k: 4
+      weight: 1.0
+    - size: 15
+      beta: 0.15
+      k: 4
+      weight: 0.33
+    - size: 50
+      beta: 0.08
+      k: 6
+      weight: 0.109
+    - size: 150
+      beta: 0.05
+      k: 8
+      weight: 0.036

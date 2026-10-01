@@ -1,0 +1,99 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "memarena"
+version = "1.0.0"
+description = "MemArena: an egocentric, permission-aware memory benchmark for LLM personal assistants."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Jiadong Zhang", email = "jiadong.zhang@mbzuai.ac.ae" },
+]
+keywords = [
+    "benchmark",
+    "llm",
+    "memory",
+    "dataset",
+    "personal-assistant",
+    "neurips",
+    "evaluation",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "requests>=2.31",
+    "tqdm>=4.66",
+    "numpy>=1.26",
+    "pandas>=2.1",
+    # Results were produced with openai 2.x; openai 3.x no longer installs httpx, which the judge scripts configure directly.
+    "openai>=1.40,<3",
+    "httpx>=0.27,<1",
+    "tiktoken>=0.7",
+    "python-dotenv>=1.0",
+    "scikit-learn>=1.3",
+    "jsonschema>=4.21",
+    "networkx>=3.2",
+    "rich>=13.7",
+    "huggingface_hub>=0.23",
+    "aiohttp>=3.9",
+    "rank-bm25>=0.2.2",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.5",
+]
+inference = [
+    "torch>=2.1",
+    "transformers>=4.40",
+    "sentence-transformers>=2.7",
+    "FlagEmbedding>=1.2",   # dense_bge_m3 / hybrid_rerank ablation backends
+]
+judge = [
+    "anthropic>=0.30",
+]
+# MemSearch backend; milvus-lite still imports pkg_resources, dropped in setuptools 81.
+memsearch = [
+    "memsearch==0.4.1",
+    "pymilvus==2.6.12",
+    "milvus-lite==2.5.1",
+    "ollama==0.6.2",
+    "setuptools>=68,<81",
+]
+
+[project.urls]
+Homepage = "https://github.com/dereksodo/MemArena-Bench"
+Repository = "https://github.com/dereksodo/MemArena-Bench"
+"Dataset (Hugging Face)" = "https://huggingface.co/datasets/dereksodo/memarena-l"
+
+[project.scripts]
+memarena-download = "scripts.download_dataset:main"
+memarena-accuracy = "scripts.run_accuracy:main"
+memarena-llmjudge = "scripts.llmjudge:main"
+memarena-latency  = "scripts.run_latency:main"
+memarena-masim    = "scripts.run_masim:main"
+memarena-figures  = "scripts.reproduce_figures:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["MASim*", "eval*", "memarena*", "scripts*"]
+exclude = ["tests*", "docs*", "config*"]
+
+[tool.setuptools.package-data]
+"MASim" = ["configs/**/*.yaml", "configs/**/*.json", "evaluation/rubrics/*.txt", "prompts/*.txt"]
+"memarena.human_calibration" = ["*.html"]

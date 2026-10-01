@@ -1,0 +1,205 @@
+# 50 activity topics for person-agent narration sessions.
+# Each topic has a prompt (conversation starter for the AI assistant),
+# category tags for persona-based filtering, and an optional occupation_hint.
+
+topics:
+  - id: cooking_new_recipe
+    prompt: "Tell me about a meal you cooked recently — what did you make?"
+    categories: [food, home, daily_routine]
+
+  - id: grocery_shopping
+    prompt: "How did your last grocery run go? Anything interesting happen?"
+    categories: [food, errands]
+
+  - id: work_project_update
+    prompt: "What's been going on at work lately?"
+    categories: [work]
+
+  - id: commute_story
+    prompt: "How was your commute today? Anything notable?"
+    categories: [transit, daily_routine]
+
+  - id: morning_routine
+    prompt: "Walk me through your morning today."
+    categories: [daily_routine, home]
+
+  - id: gym_workout
+    prompt: "Did you work out recently? What did you do?"
+    categories: [fitness, health]
+
+  - id: running_or_walking
+    prompt: "Have you been out for a run or walk lately?"
+    categories: [fitness, nature]
+
+  - id: weekend_plans
+    prompt: "What are you thinking of doing this weekend?"
+    categories: [social, entertainment]
+
+  - id: catching_up_with_friend
+    prompt: "Have you talked to any friends recently? What did you catch up on?"
+    categories: [social]
+
+  - id: family_dinner
+    prompt: "Tell me about a recent meal with family."
+    categories: [family, food, social]
+
+  - id: kids_school_event
+    prompt: "Has anything been happening with the kids at school?"
+    categories: [family]
+    occupation_hint: parent
+
+  - id: pet_antics
+    prompt: "What has your pet been up to lately?"
+    categories: [pets, home]
+
+  - id: gardening
+    prompt: "Have you done any gardening or yard work recently?"
+    categories: [nature, home, creative]
+
+  - id: hiking_or_park
+    prompt: "Been to any parks or trails lately?"
+    categories: [nature, fitness]
+
+  - id: home_improvement
+    prompt: "Have you been working on anything around the house?"
+    categories: [home, creative]
+
+  - id: reading_book
+    prompt: "Are you reading anything good right now?"
+    categories: [entertainment, learning]
+
+  - id: watching_show
+    prompt: "Have you been watching anything interesting on TV?"
+    categories: [entertainment]
+
+  - id: movie_night
+    prompt: "Seen any good movies recently?"
+    categories: [entertainment, social]
+
+  - id: podcast_discovery
+    prompt: "Listened to any good podcasts lately?"
+    categories: [entertainment, learning]
+
+  - id: music_listening
+    prompt: "What have you been listening to music-wise?"
+    categories: [entertainment, creative]
+
+  - id: playing_instrument
+    prompt: "Have you been playing any music recently?"
+    categories: [creative, entertainment]
+
+  - id: art_or_craft
+    prompt: "Have you done any creative or craft projects lately?"
+    categories: [creative]
+
+  - id: learning_new_skill
+    prompt: "Have you been trying to learn anything new?"
+    categories: [learning]
+
+  - id: online_course
+    prompt: "Are you taking any classes or courses?"
+    categories: [learning, tech]
+
+  - id: tech_gadget
+    prompt: "Used any new apps or gadgets lately?"
+    categories: [tech]
+
+  - id: phone_upgrade
+    prompt: "Done anything with your phone or computer setup recently?"
+    categories: [tech, errands]
+
+  - id: budgeting
+    prompt: "How's the financial side of things going?"
+    categories: [finance]
+
+  - id: shopping_haul
+    prompt: "Bought anything interesting recently?"
+    categories: [errands, finance]
+
+  - id: doctor_visit
+    prompt: "Any recent doctor or health appointments?"
+    categories: [health, errands]
+
+  - id: sleep_habits
+    prompt: "How have you been sleeping lately?"
+    categories: [health, daily_routine]
+
+  - id: travel_planning
+    prompt: "Are you planning any trips?"
+    categories: [travel]
+
+  - id: recent_trip
+    prompt: "Tell me about a trip you took recently."
+    categories: [travel, social]
+
+  - id: restaurant_visit
+    prompt: "Been to any restaurants lately? What'd you have?"
+    categories: [food, social]
+
+  - id: coffee_shop
+    prompt: "Have you been to your usual coffee spot recently?"
+    categories: [food, daily_routine]
+
+  - id: volunteer_work
+    prompt: "Have you been involved in any community or volunteer activities?"
+    categories: [community]
+
+  - id: neighbourhood_event
+    prompt: "Anything going on in the neighbourhood lately?"
+    categories: [community, social]
+
+  - id: weather_impact
+    prompt: "How's the weather been affecting your day?"
+    categories: [weather, daily_routine]
+
+  - id: seasonal_change
+    prompt: "How are you feeling about the change in seasons?"
+    categories: [weather, nature]
+
+  - id: errand_run
+    prompt: "Any errands you had to deal with recently?"
+    categories: [errands, daily_routine]
+
+  - id: car_maintenance
+    prompt: "How's the car doing? Any maintenance stuff?"
+    categories: [errands, transit]
+
+  - id: cleaning_organizing
+    prompt: "Done any cleaning or organizing at home?"
+    categories: [home, daily_routine]
+
+  - id: cooking_experiment
+    prompt: "Have you tried making anything new in the kitchen?"
+    categories: [food, creative]
+
+  - id: social_media_moment
+    prompt: "Seen anything funny or interesting online recently?"
+    categories: [tech, entertainment, social]
+
+  - id: work_colleague_story
+    prompt: "Anything interesting happen with coworkers?"
+    categories: [work, social]
+
+  - id: dating_or_relationship
+    prompt: "How's the relationship side of life going?"
+    categories: [social, family]
+
+  - id: self_care_routine
+    prompt: "Have you done anything nice for yourself lately?"
+    categories: [health, daily_routine]
+
+  - id: sports_event
+    prompt: "Been following any sports? Anything exciting happen?"
+    categories: [entertainment, social]
+
+  - id: game_night
+    prompt: "Played any games recently — board games, video games?"
+    categories: [entertainment, social, tech]
+
+  - id: photography
+    prompt: "Taken any good photos lately?"
+    categories: [creative, tech, nature]
+
+  - id: financial_goal
+    prompt: "How are things going with any financial goals you have?"
+    categories: [finance, learning]

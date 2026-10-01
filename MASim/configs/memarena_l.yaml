@@ -1,0 +1,26 @@
+# MemArena-L: 50 agents, 15 days
+
+base: memarena_base.yaml
+
+graph:
+  n_agents: 50
+  model: watts_strogatz
+  seed: 42
+  alpha: 0.33
+  layers:
+    - size: 5
+      beta: 0.30
+      k: 4
+      weight: 1.0
+    - size: 15
+      beta: 0.15
+      k: 4
+      weight: 0.33
+    - size: 50
+      beta: 0.08
+      k: 6
+      weight: 0.109
+
+n_events: 75
+sessions_per_day_per_agent: 18  # bumped from 15 to hit ~10K tok/person/day
+time_range: [0.0, 15.0]

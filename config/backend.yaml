@@ -1,0 +1,67 @@
+# Backend configuration for MemArena's accuracy + latency test programs.
+#
+# Users bring their own inference stack. This file declares, per backend,
+# (a) how to reach the service, (b) which model checkpoint to use, and
+# (c) any backend-specific tuning knobs. Any CLI flag on run_accuracy.py
+# or run_latency.py overrides the matching yaml field.
+#
+# Environment-variable overrides (read by memarena.config.load_backend_yaml):
+#   MEMARENA_SGLANG_URL     overrides sglang.url
+#   MEMARENA_MEMOBASE_URL   overrides memobase.url
+#   MEMARENA_MEMOS_URL      overrides memos.url
+
+# --- Reader LLMs ------------------------------------------------------
+sglang:
+  # SGLang server the reader model runs behind. Users launch this
+  # themselves (docker or native). We do not ship weights.
+  url: "http://localhost:16000"
+  # Hugging Face model id or a local path on the user's machine.
+  # Examples: "Qwen/Qwen3-0.6B", "meta-llama/Llama-3.2-3B",
+  #           "mistralai/Mistral-7B-Instruct-v0.3",
+  #           "Qwen/Qwen3-8B", "Qwen/Qwen3-32B-AWQ"
+  model_name: "Qwen/Qwen3-0.6B"
+  # bf16 | fp16 | awq | fp8
+  dtype: "bf16"
+  # Context window in tokens. Must be >= benchmark max prompt length.
+  max_context: 32768
+  timeout_seconds: 120
+
+# --- Judge LLM (used by run_accuracy.py in non-dry-run mode) ----------
+judge:
+  provider: "openai"          # openai | openrouter | anthropic
+  model_name: "gpt-4o-mini"
+  temperature: 0.0
+  max_tokens: 256
+
+# --- Structured-memory backends ---------------------------------------
+memobase:
+  url: "http://localhost:8019"
+  api_version: "v1"
+  # The live service extractor is configured by scripts/setup_memory_backends.sh
+  # and should match the reader model for the current eval cell.
+  extractor_model: "Qwen/Qwen3-0.6B"
+
+memos:
+  url: "http://localhost:8020"
+  api_version: "v1"
+  extractor_model: "Qwen/Qwen3-0.6B"
+
+# --- Retrieval backends (RAG variants) --------------------------------
+rag:
+  retriever: "bm25"                  # bm25 | bge_m3 | hybrid_rrf
+  top_k: 5
+  # Only used when retriever == "bge_m3" or "hybrid_rrf":
+  bge_m3_model: "BAAI/bge-m3"
+  bge_m3_max_length: 2048
+  # Only used when retriever == "hybrid_rrf":
+  rrf_k: 60
+
+# --- Latency probe defaults -------------------------------------------
+latency:
+  warmup_queries: 3
+  sampled_queries: 10                # number of queries to time per backend
+  record_hardware: false             # enable nvidia-smi / powermetrics probes
+  deterministic_fake_ms:             # used when --dry-run is passed
+    ttft: 50                         # fake time-to-first-token, milliseconds
+    decode_tok_per_s: 40             # fake decode throughput
+    ingest_s_per_day: 180            # fake per-day Memobase ingest time

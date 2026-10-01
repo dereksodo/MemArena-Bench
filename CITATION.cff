@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this code or the MemArena-L dataset, please cite the paper below."
+title: "MemArena: code for the MemArena-L benchmark and the MASim simulator"
+type: software
+license: MIT
+repository-code: "https://github.com/dereksodo/MemArena-Bench"
+authors:
+  - family-names: "Zhang"
+    given-names: "Jiadong"
+    affiliation: "MBZUAI"
+    email: "jiadong.zhang@mbzuai.ac.ae"
+  - family-names: "Ma"
+    given-names: "Xiaosong"
+    affiliation: "MBZUAI"
+keywords: [memory, agents, long-context, multi-user, ego-centric, on-device, permission-aware, benchmark]
+references:
+  - type: dataset
+    title: "MemArena-L"
+    license: "CC-BY-4.0"
+    url: "https://huggingface.co/datasets/dereksodo/memarena-l"
+    authors:
+      - family-names: "Zhang"
+        given-names: "Jiadong"
+      - family-names: "Ma"
+        given-names: "Xiaosong"
+preferred-citation:
+  type: conference-paper
+  title: "MemArena: An Ego-Centric Benchmark for On-Device Agentic Personal Memory Assistants at Scale"
+  year: 2026
+  collection-title: "Advances in Neural Information Processing Systems 39 (NeurIPS 2026), Evaluations and Datasets Track"
+  identifiers:
+    - type: other
+      value: "arXiv:2608.02613"
+  url: "https://arxiv.org/abs/2608.02613"
+  authors:
+    - family-names: "Zhang"
+      given-names: "Jiadong"
+      affiliation: "MBZUAI"
+    - family-names: "Ma"
+      given-names: "Xiaosong"
+      affiliation: "MBZUAI"

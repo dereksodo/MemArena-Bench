@@ -1,0 +1,28 @@
+# FLUX.1-dev image generation server
+# DGX Spark: single GPU (unified memory)
+#
+# Usage:
+#   python serve_flux2.py --config MASim/configs/serve_flux2.yaml
+#   (or launched via launch_media_servers.sh which reads this file)
+
+server:
+  host: "0.0.0.0"
+  port: 8100
+  log_level: "info"
+
+model:
+  path: "~/models/FLUX.1-dev"
+  dtype: "bfloat16"
+  # Full-card: keep entire model on GPU, no CPU offload
+  cpu_offload: false
+
+generation_defaults:
+  num_inference_steps: 20  # dev uses 20 steps (distilled schnell used 4)
+  guidance_scale: 3.5      # dev requires classifier-free guidance
+  width: 512
+  height: 512
+  num_images: 1
+
+gpu:
+  device_id: 0            # DGX Spark single GPU
+  memory_fraction: 1.0    # use entire card

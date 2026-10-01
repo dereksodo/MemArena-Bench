@@ -1,0 +1,33 @@
+# Small GPU integration run: 5 agents, 10 days, roughly 5K text tokens per
+# ego agent per day. This is intended for end-to-end MASim testing on a single
+# local SGLang endpoint, not for the released MemArena-L benchmark.
+
+base: memarena_base.yaml
+
+llm:
+  endpoint: "http://127.0.0.1:8000/v1"
+  api_key: "EMPTY"
+  model: "qwen3"
+  temperature: 0.7
+  max_tokens: 512
+  timeout_seconds: 600
+  max_retries: 3
+  concurrency: 32
+  unlimited_tokens: true
+
+graph:
+  n_agents: 5
+  model: watts_strogatz
+  seed: 42
+  alpha: 0.33
+  layers:
+    - size: 5
+      beta: 0.30
+      k: 4
+      weight: 1.0
+
+n_events: 15
+sessions_per_day_per_agent: 4
+target_tokens: 0
+time_range: [0.0, 10.0]
+day_length: 1.0

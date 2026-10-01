@@ -1,0 +1,8 @@
+# model_tag|model_name|endpoint|memobase_url|memos_url
+# Paper full-matrix reader set. Edit endpoint/model_name to match your servers.
+# The memory URLs are per-reader isolated stacks for parallel memobase/memos runs.
+0_6b|Qwen/Qwen3-0.6B|http://localhost:16000|http://localhost:18100|http://localhost:18101
+llama3b|meta-llama/Llama-3.2-3B-Instruct|http://localhost:16001|http://localhost:18102|http://localhost:18103
+7b|mistralai/Mistral-7B-Instruct-v0.3|http://localhost:16002|http://localhost:18104|http://localhost:18105
+8b|Qwen/Qwen3-8B|http://localhost:16003|http://localhost:18106|http://localhost:18107
+32b|Qwen/Qwen3-32B-AWQ|http://localhost:16004|http://localhost:18108|http://localhost:18109

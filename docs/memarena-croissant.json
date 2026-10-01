@@ -1,0 +1,1402 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "arrayShape": "cr:arrayShape",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "containedIn": "cr:containedIn",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "dct": "http://purl.org/dc/terms/",
+    "equivalentProperty": "cr:equivalentProperty",
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "prov": "http://www.w3.org/ns/prov#",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "samplingRate": "cr:samplingRate",
+    "sc": "https://schema.org/",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "name": "MemArena-L",
+  "description": "A synthetic benchmark for ego-centric, multi-user, long-horizon memory evaluation in personal agents. MemArena-L contains 50 synthetic agents over 15 simulated days, 13,343 sessions, 137,279 turns, 10,305,361 dialogue-text tokens, and 1,523 evaluation instances across nine released internal task files. Every d4_permission item (paper dimension D6) carries a protected fact and is scored by F1_PU; the generator's 56 fact-less behavioural probes (known-requester ALLOW, anonymous-querier DENY) are not released, since a fact-level judge cannot score them.",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "version": "1.0.0",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "url": "https://huggingface.co/datasets/dereksodo/memarena-l",
+  "datePublished": "2026-05-01",
+  "creator": [
+    {
+      "@type": "Person",
+      "name": "Jiadong Zhang",
+      "affiliation": "MBZUAI",
+      "email": "jiadong.zhang@mbzuai.ac.ae"
+    },
+    {
+      "@type": "Person",
+      "name": "Xiaosong Ma",
+      "affiliation": "MBZUAI"
+    }
+  ],
+  "publisher": {
+    "@type": "Organization",
+    "name": "MBZUAI"
+  },
+  "keywords": [
+    "memory",
+    "agents",
+    "long-context",
+    "multi-user",
+    "ego-centric",
+    "on-device",
+    "open-weight",
+    "permission-aware",
+    "benchmark",
+    "synthetic"
+  ],
+  "citeAs": "@inproceedings{memarena2026,\n  title     = {MemArena: An Ego-Centric Benchmark for On-Device Agentic Personal Memory Assistants at Scale},\n  author    = {Zhang, Jiadong and Ma, Xiaosong},\n  booktitle = {Advances in Neural Information Processing Systems 39 (NeurIPS 2026), Evaluations and Datasets Track},\n  year      = {2026},\n  eprint    = {2608.02613},\n  archivePrefix = {arXiv},\n}",
+  "isLiveDataset": false,
+  "rai:hasSyntheticData": true,
+  "rai:dataLimitations": [
+    "Synthetic English text only; no real human conversations are included.",
+    "The dataset contains 50 agents and 15 simulated days, so it should not be used for population-level claims or year-long memory claims.",
+    "Probe diversity is bounded by the simulator and task extractors.",
+    "The released benchmark is intended for evaluation, not model training.",
+    "Every d4_permission item (paper dimension D6) carries a protected fact and is scored by F1_PU; the generator's 56 fact-less behavioural probes (known-requester ALLOW, anonymous-querier DENY) are not released, since a fact-level judge cannot score them."
+  ],
+  "rai:dataBiases": [
+    "Dialogue style reflects the simulator and generator model family.",
+    "Persona, topic, and location distributions are synthetic and controlled rather than representative of real populations.",
+    "The corpus is English-centric."
+  ],
+  "rai:personalSensitiveInformation": [
+    "No real personal information is included.",
+    "All personas, events, locations, and sensitive facts are fictional.",
+    "Permission-marked utterances are synthetic and included only to evaluate permission-aware behavior."
+  ],
+  "rai:dataUseCases": [
+    "Benchmark memory-augmented agents on long-horizon ego-centric recall.",
+    "Compare retrieval, context, and structured-memory backends.",
+    "Evaluate abstention and permission-aware access under multi-user personal memory."
+  ],
+  "rai:dataSocialImpact": "The dataset supports controlled evaluation of personal-agent memory under privacy-aware, ego-centric conditions. Misuse risk: using the evaluation text as training data may contaminate benchmark comparisons or teach undesirable disclosure behavior.",
+  "prov:wasDerivedFrom": [
+    {
+      "@id": "MASim/configs/reviewed_personas_l.jsonl",
+      "description": "Reviewed persona pool used by the MASim simulator."
+    },
+    {
+      "@id": "MASim/data/activity_topics.yaml",
+      "description": "Activity-topic ontology used by the simulator's event and session scheduler."
+    }
+  ],
+  "prov:wasGeneratedBy": {
+    "@type": "prov:Activity",
+    "name": "MASim multi-agent simulation pipeline",
+    "description": "A synthetic multi-agent simulator generated the social graph, personas, schedules, sessions, ego-centric projections, and evaluation instances. See pipeline_report.json for generation statistics."
+  },
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "agents_personas.jsonl.gz",
+      "name": "agents_personas.jsonl.gz",
+      "contentUrl": "agents_personas.jsonl.gz",
+      "encodingFormat": "application/gzip",
+      "sha256": "7cb25a07ad9cab168dc8646686ed3e063046e6ec2fbaa1bb2b40796daa872509"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "agent_schedules.jsonl.gz",
+      "name": "agent_schedules.jsonl.gz",
+      "contentUrl": "agent_schedules.jsonl.gz",
+      "encodingFormat": "application/gzip",
+      "sha256": "eb5e7a38b1cf0b08791f9558ef08c88fe3da3a877ac89703d770c18ff6d9a54a"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "corpus_sessions.jsonl.gz",
+      "name": "corpus_sessions.jsonl.gz",
+      "contentUrl": "corpus_sessions.jsonl.gz",
+      "encodingFormat": "application/gzip",
+      "sha256": "f9c373ed1f52f09e4d1f3690603092154bd0ddfbdeda6bee9d6699ef757c2c8b"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "events.jsonl",
+      "name": "events.jsonl",
+      "contentUrl": "events.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "d60a1077e58fbfab6b25095bcb026e35e198575a994e176460a85f583dd4f7b2"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "groups.json",
+      "name": "groups.json",
+      "contentUrl": "groups.json",
+      "encodingFormat": "application/json",
+      "sha256": "1b84905f1ad0f30a1a71e54d0fdb95811db8aa6c43b2a657ee7e14af0c40943e"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "locations.json",
+      "name": "locations.json",
+      "contentUrl": "locations.json",
+      "encodingFormat": "application/json",
+      "sha256": "31b639916075732a81d63f5d85054e3213a4a8c70e3e4fec4cc0c69f5867c546"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "graph_edges.jsonl",
+      "name": "graph_edges.jsonl",
+      "contentUrl": "graph_edges.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "ba022ada09cfe817cba51fee6e6928a28e3dc075a748f19e237e59ceeff240cf"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "ego_projections.json",
+      "name": "ego_projections.json",
+      "contentUrl": "ego_projections.json",
+      "encodingFormat": "application/json",
+      "sha256": "4eb53e971a04c419e9de4adf7f0db74a6d9cd2e21e9242218b508e901db3d90f"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "ego_session_map.json",
+      "name": "ego_session_map.json",
+      "contentUrl": "ego_session_map.json",
+      "encodingFormat": "application/json",
+      "sha256": "8165ab65912221e794bf9cb683cdded8ef30a19568451fa2b6db2f0d9d8311f5"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "day_checkpoint.json",
+      "name": "day_checkpoint.json",
+      "contentUrl": "day_checkpoint.json",
+      "encodingFormat": "application/json",
+      "sha256": "ee68b1b92c059e96ee85ab6ff8ff96757044531794a745e123a193a7143f2654"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "pipeline_report.json",
+      "name": "pipeline_report.json",
+      "contentUrl": "pipeline_report.json",
+      "encodingFormat": "application/json",
+      "sha256": "6d1b8f6d746a163e5396a2435607c1303eb2b67aa587420a30547419c9be6803"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "eval_instances/d1_conflict.jsonl",
+      "name": "eval_instances/d1_conflict.jsonl",
+      "contentUrl": "eval_instances/d1_conflict.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "f108a43b0f09caf25735472178fc7b0004160cb93fa8e83282d211b8414e66d6"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "eval_instances/d2_anaphora.jsonl",
+      "name": "eval_instances/d2_anaphora.jsonl",
+      "contentUrl": "eval_instances/d2_anaphora.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "eeebccae2223abafebc388c5eb44bd816aa92c924055e179d93ec2ff69efab13"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "eval_instances/d3_confabulation.jsonl",
+      "name": "eval_instances/d3_confabulation.jsonl",
+      "contentUrl": "eval_instances/d3_confabulation.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "b8b890c4d851a583bcada5d619d2135f31308904c48cecc8d970b2577638c18a"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "eval_instances/d4_permission.jsonl",
+      "name": "eval_instances/d4_permission.jsonl",
+      "contentUrl": "eval_instances/d4_permission.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "f1e5d0dbb8b3629112f9444a2db8827ba2e2a81af431f45aef4fccbde6f68488"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "eval_instances/d5_cloze.jsonl",
+      "name": "eval_instances/d5_cloze.jsonl",
+      "contentUrl": "eval_instances/d5_cloze.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "1616aacedc8ccc7096c3a4d105991d788fda02e78f82815c39e6d67a3405b420"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "eval_instances/d6_metadata.jsonl",
+      "name": "eval_instances/d6_metadata.jsonl",
+      "contentUrl": "eval_instances/d6_metadata.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "6ed5437b8404aae220670767135765c5b8bfb424a6fe899859202ff20e23da27"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "eval_instances/d7_qa.jsonl",
+      "name": "eval_instances/d7_qa.jsonl",
+      "contentUrl": "eval_instances/d7_qa.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "a609518e3bd0607d39e5cdcac426d3badd32d2991d1febff75b7c1ca3d3c0d1c"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "eval_instances/d8_temporal.jsonl",
+      "name": "eval_instances/d8_temporal.jsonl",
+      "contentUrl": "eval_instances/d8_temporal.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "3caebe975ad8cea325c1fffb8ef1710cc48d1bdcede97c9a73676dad1c531f58"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "eval_instances/d10_counterfactual.jsonl",
+      "name": "eval_instances/d10_counterfactual.jsonl",
+      "contentUrl": "eval_instances/d10_counterfactual.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "sha256": "d47ca9a6de296ab7f3f5a7b518671827076da998cbc574596a2de5de6d6608c3"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "eval_d1_conflict",
+      "name": "eval_d1_conflict",
+      "description": "Conflict-resolution evaluation probes.",
+      "key": {
+        "@id": "eval_d1_conflict/instance_id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d1_conflict/instance_id",
+          "name": "instance_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d1_conflict.jsonl"
+            },
+            "extract": {
+              "column": "instance_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d1_conflict/dimension",
+          "name": "dimension",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d1_conflict.jsonl"
+            },
+            "extract": {
+              "column": "dimension"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d1_conflict/query",
+          "name": "query",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d1_conflict.jsonl"
+            },
+            "extract": {
+              "column": "query"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d1_conflict/difficulty",
+          "name": "difficulty",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d1_conflict.jsonl"
+            },
+            "extract": {
+              "column": "difficulty"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d1_conflict/asker_agent_id",
+          "name": "asker_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d1_conflict.jsonl"
+            },
+            "extract": {
+              "column": "asker_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d1_conflict/answerer_agent_id",
+          "name": "answerer_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d1_conflict.jsonl"
+            },
+            "extract": {
+              "column": "answerer_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d1_conflict/ego_agent_id",
+          "name": "ego_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d1_conflict.jsonl"
+            },
+            "extract": {
+              "column": "ego_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d1_conflict/context_tier",
+          "name": "context_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d1_conflict.jsonl"
+            },
+            "extract": {
+              "column": "context_tier"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "eval_d2_anaphora",
+      "name": "eval_d2_anaphora",
+      "description": "Anaphora and entity-resolution evaluation probes.",
+      "key": {
+        "@id": "eval_d2_anaphora/instance_id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d2_anaphora/instance_id",
+          "name": "instance_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d2_anaphora.jsonl"
+            },
+            "extract": {
+              "column": "instance_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d2_anaphora/dimension",
+          "name": "dimension",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d2_anaphora.jsonl"
+            },
+            "extract": {
+              "column": "dimension"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d2_anaphora/query",
+          "name": "query",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d2_anaphora.jsonl"
+            },
+            "extract": {
+              "column": "query"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d2_anaphora/difficulty",
+          "name": "difficulty",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d2_anaphora.jsonl"
+            },
+            "extract": {
+              "column": "difficulty"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d2_anaphora/asker_agent_id",
+          "name": "asker_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d2_anaphora.jsonl"
+            },
+            "extract": {
+              "column": "asker_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d2_anaphora/answerer_agent_id",
+          "name": "answerer_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d2_anaphora.jsonl"
+            },
+            "extract": {
+              "column": "answerer_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d2_anaphora/ego_agent_id",
+          "name": "ego_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d2_anaphora.jsonl"
+            },
+            "extract": {
+              "column": "ego_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d2_anaphora/context_tier",
+          "name": "context_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d2_anaphora.jsonl"
+            },
+            "extract": {
+              "column": "context_tier"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "eval_d3_confabulation",
+      "name": "eval_d3_confabulation",
+      "description": "Abstention/confabulation evaluation probes.",
+      "key": {
+        "@id": "eval_d3_confabulation/instance_id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d3_confabulation/instance_id",
+          "name": "instance_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d3_confabulation.jsonl"
+            },
+            "extract": {
+              "column": "instance_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d3_confabulation/dimension",
+          "name": "dimension",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d3_confabulation.jsonl"
+            },
+            "extract": {
+              "column": "dimension"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d3_confabulation/query",
+          "name": "query",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d3_confabulation.jsonl"
+            },
+            "extract": {
+              "column": "query"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d3_confabulation/difficulty",
+          "name": "difficulty",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d3_confabulation.jsonl"
+            },
+            "extract": {
+              "column": "difficulty"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d3_confabulation/asker_agent_id",
+          "name": "asker_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d3_confabulation.jsonl"
+            },
+            "extract": {
+              "column": "asker_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d3_confabulation/answerer_agent_id",
+          "name": "answerer_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d3_confabulation.jsonl"
+            },
+            "extract": {
+              "column": "answerer_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d3_confabulation/ego_agent_id",
+          "name": "ego_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d3_confabulation.jsonl"
+            },
+            "extract": {
+              "column": "ego_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d3_confabulation/context_tier",
+          "name": "context_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d3_confabulation.jsonl"
+            },
+            "extract": {
+              "column": "context_tier"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "eval_d4_permission",
+      "name": "eval_d4_permission",
+      "description": "Permission-aware disclosure evaluation probes.",
+      "key": {
+        "@id": "eval_d4_permission/instance_id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d4_permission/instance_id",
+          "name": "instance_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d4_permission.jsonl"
+            },
+            "extract": {
+              "column": "instance_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d4_permission/dimension",
+          "name": "dimension",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d4_permission.jsonl"
+            },
+            "extract": {
+              "column": "dimension"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d4_permission/query",
+          "name": "query",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d4_permission.jsonl"
+            },
+            "extract": {
+              "column": "query"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d4_permission/difficulty",
+          "name": "difficulty",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d4_permission.jsonl"
+            },
+            "extract": {
+              "column": "difficulty"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d4_permission/asker_agent_id",
+          "name": "asker_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d4_permission.jsonl"
+            },
+            "extract": {
+              "column": "asker_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d4_permission/answerer_agent_id",
+          "name": "answerer_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d4_permission.jsonl"
+            },
+            "extract": {
+              "column": "answerer_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d4_permission/ego_agent_id",
+          "name": "ego_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d4_permission.jsonl"
+            },
+            "extract": {
+              "column": "ego_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d4_permission/context_tier",
+          "name": "context_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d4_permission.jsonl"
+            },
+            "extract": {
+              "column": "context_tier"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "eval_d5_cloze",
+      "name": "eval_d5_cloze",
+      "description": "Cloze-deletion recall probes.",
+      "key": {
+        "@id": "eval_d5_cloze/instance_id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d5_cloze/instance_id",
+          "name": "instance_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d5_cloze.jsonl"
+            },
+            "extract": {
+              "column": "instance_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d5_cloze/dimension",
+          "name": "dimension",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d5_cloze.jsonl"
+            },
+            "extract": {
+              "column": "dimension"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d5_cloze/query",
+          "name": "query",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d5_cloze.jsonl"
+            },
+            "extract": {
+              "column": "query"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d5_cloze/difficulty",
+          "name": "difficulty",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d5_cloze.jsonl"
+            },
+            "extract": {
+              "column": "difficulty"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d5_cloze/asker_agent_id",
+          "name": "asker_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d5_cloze.jsonl"
+            },
+            "extract": {
+              "column": "asker_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d5_cloze/answerer_agent_id",
+          "name": "answerer_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d5_cloze.jsonl"
+            },
+            "extract": {
+              "column": "answerer_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d5_cloze/ego_agent_id",
+          "name": "ego_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d5_cloze.jsonl"
+            },
+            "extract": {
+              "column": "ego_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d5_cloze/context_tier",
+          "name": "context_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d5_cloze.jsonl"
+            },
+            "extract": {
+              "column": "context_tier"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "eval_d6_metadata",
+      "name": "eval_d6_metadata",
+      "description": "Metadata recall probes.",
+      "key": {
+        "@id": "eval_d6_metadata/instance_id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d6_metadata/instance_id",
+          "name": "instance_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d6_metadata.jsonl"
+            },
+            "extract": {
+              "column": "instance_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d6_metadata/dimension",
+          "name": "dimension",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d6_metadata.jsonl"
+            },
+            "extract": {
+              "column": "dimension"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d6_metadata/query",
+          "name": "query",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d6_metadata.jsonl"
+            },
+            "extract": {
+              "column": "query"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d6_metadata/difficulty",
+          "name": "difficulty",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d6_metadata.jsonl"
+            },
+            "extract": {
+              "column": "difficulty"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d6_metadata/asker_agent_id",
+          "name": "asker_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d6_metadata.jsonl"
+            },
+            "extract": {
+              "column": "asker_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d6_metadata/answerer_agent_id",
+          "name": "answerer_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d6_metadata.jsonl"
+            },
+            "extract": {
+              "column": "answerer_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d6_metadata/ego_agent_id",
+          "name": "ego_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d6_metadata.jsonl"
+            },
+            "extract": {
+              "column": "ego_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d6_metadata/context_tier",
+          "name": "context_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d6_metadata.jsonl"
+            },
+            "extract": {
+              "column": "context_tier"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "eval_d7_qa",
+      "name": "eval_d7_qa",
+      "description": "Standard QA recall probes.",
+      "key": {
+        "@id": "eval_d7_qa/instance_id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d7_qa/instance_id",
+          "name": "instance_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d7_qa.jsonl"
+            },
+            "extract": {
+              "column": "instance_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d7_qa/dimension",
+          "name": "dimension",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d7_qa.jsonl"
+            },
+            "extract": {
+              "column": "dimension"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d7_qa/query",
+          "name": "query",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d7_qa.jsonl"
+            },
+            "extract": {
+              "column": "query"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d7_qa/difficulty",
+          "name": "difficulty",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d7_qa.jsonl"
+            },
+            "extract": {
+              "column": "difficulty"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d7_qa/asker_agent_id",
+          "name": "asker_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d7_qa.jsonl"
+            },
+            "extract": {
+              "column": "asker_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d7_qa/answerer_agent_id",
+          "name": "answerer_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d7_qa.jsonl"
+            },
+            "extract": {
+              "column": "answerer_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d7_qa/ego_agent_id",
+          "name": "ego_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d7_qa.jsonl"
+            },
+            "extract": {
+              "column": "ego_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d7_qa/context_tier",
+          "name": "context_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d7_qa.jsonl"
+            },
+            "extract": {
+              "column": "context_tier"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "eval_d8_temporal",
+      "name": "eval_d8_temporal",
+      "description": "Temporal reasoning probes.",
+      "key": {
+        "@id": "eval_d8_temporal/instance_id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d8_temporal/instance_id",
+          "name": "instance_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d8_temporal.jsonl"
+            },
+            "extract": {
+              "column": "instance_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d8_temporal/dimension",
+          "name": "dimension",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d8_temporal.jsonl"
+            },
+            "extract": {
+              "column": "dimension"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d8_temporal/query",
+          "name": "query",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d8_temporal.jsonl"
+            },
+            "extract": {
+              "column": "query"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d8_temporal/difficulty",
+          "name": "difficulty",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d8_temporal.jsonl"
+            },
+            "extract": {
+              "column": "difficulty"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d8_temporal/asker_agent_id",
+          "name": "asker_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d8_temporal.jsonl"
+            },
+            "extract": {
+              "column": "asker_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d8_temporal/answerer_agent_id",
+          "name": "answerer_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d8_temporal.jsonl"
+            },
+            "extract": {
+              "column": "answerer_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d8_temporal/ego_agent_id",
+          "name": "ego_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d8_temporal.jsonl"
+            },
+            "extract": {
+              "column": "ego_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d8_temporal/context_tier",
+          "name": "context_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d8_temporal.jsonl"
+            },
+            "extract": {
+              "column": "context_tier"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "cr:RecordSet",
+      "@id": "eval_d10_counterfactual",
+      "name": "eval_d10_counterfactual",
+      "description": "Counterfactual hardening probes.",
+      "key": {
+        "@id": "eval_d10_counterfactual/instance_id"
+      },
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d10_counterfactual/instance_id",
+          "name": "instance_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d10_counterfactual.jsonl"
+            },
+            "extract": {
+              "column": "instance_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d10_counterfactual/dimension",
+          "name": "dimension",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d10_counterfactual.jsonl"
+            },
+            "extract": {
+              "column": "dimension"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d10_counterfactual/query",
+          "name": "query",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d10_counterfactual.jsonl"
+            },
+            "extract": {
+              "column": "query"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d10_counterfactual/difficulty",
+          "name": "difficulty",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d10_counterfactual.jsonl"
+            },
+            "extract": {
+              "column": "difficulty"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d10_counterfactual/asker_agent_id",
+          "name": "asker_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d10_counterfactual.jsonl"
+            },
+            "extract": {
+              "column": "asker_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d10_counterfactual/answerer_agent_id",
+          "name": "answerer_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d10_counterfactual.jsonl"
+            },
+            "extract": {
+              "column": "answerer_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d10_counterfactual/ego_agent_id",
+          "name": "ego_agent_id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d10_counterfactual.jsonl"
+            },
+            "extract": {
+              "column": "ego_agent_id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "eval_d10_counterfactual/context_tier",
+          "name": "context_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "eval_instances/d10_counterfactual.jsonl"
+            },
+            "extract": {
+              "column": "context_tier"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "sameAs": "https://arxiv.org/abs/2608.02613"
+}

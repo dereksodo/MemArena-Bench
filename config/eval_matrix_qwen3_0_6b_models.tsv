@@ -1,0 +1,3 @@
+# model_tag|model_name|endpoint
+# Single-reader quick evaluation preset.
+0_6b|Qwen/Qwen3-0.6B|http://localhost:16000

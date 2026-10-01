@@ -1,0 +1,129 @@
+# MemArena evaluation pipeline config
+#
+# API key resolution order (for the answer model):
+#   1. answer.api_key in this file (supports ${ENV_VAR} syntax)
+#   2. OPENROUTER_API_KEY env var
+#   3. LLM_API_KEY env var
+#   4. Falls back to "EMPTY" (for local/sglang endpoints that don't require a key)
+#
+# Judge resolution (for the evaluate stage that scores answers):
+#   Default judge model is gpt-4o-mini-2024-07-18 (date-pinned). The pipeline will auto-judge during
+#   the `evaluate` stage. To run the pipeline you must set ONE of:
+#     export OPENAI_API_KEY=sk-...               # judges via api.openai.com
+#     export OPENROUTER_API_KEY=sk-or-v1-...     # judges via openrouter.ai
+#   The first available key wins. The judge endpoint switches automatically.
+#
+# Quick-start with OpenRouter (covers both answer + judge):
+#   export OPENROUTER_API_KEY=sk-or-v1-...
+#   python -m eval.cli --run-dir MASim/runs/my_run/ --system mem0 \
+#       --stages add search answer evaluate
+
+# ---------------------------------------------------------------------------
+# Answer model (used for the answerer LLM that reads retrieved memories)
+# ---------------------------------------------------------------------------
+answer:
+  # --- Option A: OpenRouter (recommended for benchmarking commercial models) ---
+  model: "anthropic/claude-sonnet-4-6"
+  endpoint: "https://openrouter.ai/api/v1"
+  api_key: "${OPENROUTER_API_KEY}"
+  temperature: 0.0
+  max_tokens: 500
+  timeout_seconds: 120
+  concurrency: 32
+  max_retries: 10
+  retry_base_delay: 1.0
+  retry_max_delay: 60.0
+  allow_fallbacks: false
+  cache_stats: true
+
+  # --- Option B: Direct Anthropic API ---
+  # model: "claude-sonnet-4-6"
+  # endpoint: "https://api.anthropic.com/v1"
+  # api_key: "${ANTHROPIC_API_KEY}"
+
+  # --- Option C: Local sglang / vLLM (no key required) ---
+  # model: "Qwen3-Coder"
+  # endpoint: "http://127.0.0.1:8000/v1"
+  # api_key: "EMPTY"
+  # concurrency: 32
+
+# ---------------------------------------------------------------------------
+# Judge model (used during the `evaluate` stage to score answers)
+# ---------------------------------------------------------------------------
+# Default: gpt-4o-mini-2024-07-18 (date-pinned snapshot the rolling
+# `gpt-4o-mini` alias resolved to during MemArena's April-May 2026 runs).
+# Pinning the snapshot rather than the alias keeps future scores
+# comparable to the published baselines even if OpenAI later reassigns
+# the rolling alias. Endpoint switches between OpenAI and OpenRouter
+# based on which API key env var is set (see header comment for details).
+# Override per-run with --judge-model / --judge-endpoint / --judge-api-key.
+judge:
+  model: "gpt-4o-mini-2024-07-18"
+  # endpoint + api_key are auto-resolved at runtime. To pin explicitly,
+  # uncomment one of the option blocks below:
+  #
+  # --- Option A: OpenAI direct (default if OPENAI_API_KEY is set) ---
+  # endpoint: "https://api.openai.com/v1"
+  # api_key: "${OPENAI_API_KEY}"
+  #
+  # --- Option B: OpenRouter (used if only OPENROUTER_API_KEY is set) ---
+  # endpoint: "https://openrouter.ai/api/v1"
+  # api_key: "${OPENROUTER_API_KEY}"
+
+# ---------------------------------------------------------------------------
+# Retrieval (used for external memory system adapters)
+# ---------------------------------------------------------------------------
+search:
+  top_k: 10
+
+# ---------------------------------------------------------------------------
+# LLM full-context baseline (no memory system — full corpus as context)
+# ---------------------------------------------------------------------------
+llm_context:
+  max_messages: 2000
+
+# ---------------------------------------------------------------------------
+# External memory backend configs
+# These supplement environment variables; env vars take precedence.
+# ---------------------------------------------------------------------------
+memos:
+  # base_url: "${MEMOS_BASE_URL}"
+  # api_key: "${MEMOS_API_KEY}"
+  add_path: "/product/add"
+  search_path: "/product/search"
+  timeout_s: 60
+  max_retries: 5
+
+mem0:
+  # base_url: "https://api.mem0.ai"
+  # api_key: "${MEM0_API_KEY}"
+  add_path: "/v1/memories"
+  search_path: "/v1/memories/search"
+  timeout_s: 30
+  max_retries: 3
+
+memobase:
+  # base_url: "${MEMOBASE_BASE_URL}"
+  # api_key: "${MEMOBASE_API_TOKEN}"
+  add_path: "/api/v1/users/buffer"
+  search_path: "/api/v1/users/context"
+  timeout_s: 60
+  max_retries: 5
+
+zep:
+  # base_url: "https://api.getzep.com"
+  # api_key: "${ZEP_API_KEY}"
+  add_path: "/api/v1/graph/add"
+  search_path: "/api/v1/graph/search"
+  timeout_s: 30
+  max_retries: 3
+
+# ---------------------------------------------------------------------------
+# vanilla adapter override. NOTE: a no-op for the answer prompt. Vanilla is
+# TEXT_SESSIONS, whose prompt ignores this adapter budget and caps the context
+# at 8,192 tokens x 3 chars (AnswerEngine._build_text_prompt); prompts are
+# identical to pipeline.yaml's. Kept so the main-table cells stay reproducible.
+# ---------------------------------------------------------------------------
+vanilla:
+  max_tokens: 512
+  max_messages: 2000

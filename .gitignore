@@ -1,0 +1,104 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Secrets — NEVER commit
+.env
+.env.local
+*.secret
+*_api_key*
+*_token*
+!memarena/figures/gen_tokenf1.py
+
+# Downloaded dataset payload (user fetches from Hugging Face)
+data/
+*.jsonl.gz
+*.tar.gz
+!tests/fixtures/*.jsonl.gz
+!MASim/data/
+
+# Local dev: MASim run outputs (full benchmark + SPARK results are external,
+# symlinked from MemArena during local figure reproduction)
+MASim/runs/
+
+# MASim location-factory cache (per (n_agents, seed) deterministic regen;
+# regeneratable from generation/location_factory.py, no need to ship)
+MASim/data/location_cache/
+
+# Script outputs
+out/
+runs/
+
+# Large eval artifacts (>100MB, GitHub hard limit)
+# These are raw LLM I/O logs; the summary JSON files are tracked instead.
+masim_transcript*.jsonl
+input_output*.json
+eval_progress_trial_paths.json
+
+# Local caches from tool runs
+*.pre_ascii_fix.*.backup
+*.repaired.[0-9]*
+sha256sums.local.txt
+
+# Figure rebuild scratch
+figures_out/
+*.pdf
+!docs/*.pdf
+!paper/**/*.pdf
+
+# Figure generator outputs land under memarena/figures/{figures,tables}/
+# because PAPER_DIR = __file__.parent for each script. Treat as build output.
+memarena/figures/figures/
+memarena/figures/tables/
+# Stray output from pre-patch scripts that wrote to ./paper/{figures,tables}/
+memarena/figures/paper/
+
+# Human-calibration live state (per-reviewer local labels)
+memarena/human_calibration/labels.json
+memarena/human_calibration/sample.json
+
+# Claude Code local settings (personal, don't commit)
+.claude/settings.local.json
+
+# Durable baseline backups (kept before fresh reproduction runs overwrite)
+.reproduction_backups/
+
+# rebuttal working caches (large, regenerable)
+docs/review/e2_realism/_cache/
+docs/review/e3_rejudge/answer_results_*
+docs/review/e3_rejudge/_*.log
+
+# Local build / export artifacts (regenerable; kept out of history for size)
+logs/
+texput.log
+paper_preprint/
+paper_preprint_arxiv/
+paper_preprint_arxiv_clean/
+paper_preprint*.zip
+paper/svg-inkscape/
+paper_rev0719/build/
+paper_rev0719/.build*/
+paper_rev0719/history/
+paper_rev0719/refs/
+paper_rev0719/svg-inkscape/
+paper_rev0719/analysis_outputs/
+paper_rev0719/croissant/dist/
+docs/review/codex/experiments/
+docs/review/codex/tmp/
+
+# Machine-local scheduler state
+.claude/scheduled_tasks.lock

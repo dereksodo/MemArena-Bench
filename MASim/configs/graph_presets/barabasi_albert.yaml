@@ -1,0 +1,8 @@
+# Barabási-Albert preferential attachment graph (ablation baseline)
+# Scale-free network with hub nodes. No Dunbar layers.
+
+graph:
+  n_agents: 50
+  model: barabasi_albert
+  seed: 42
+  ba_m: 3      # edges per new node

@@ -96,7 +96,8 @@ python scripts/reproduce_figures.py --runs-dir out/runs --all --out-dir out/pape
 `reproduce_figures.py` rebuilds every table and figure of the paper from per-item judge outputs;
 the result files behind the paper are not distributed, so it runs on your own outputs. The inputs
 of each artifact, hardware and service setup, judge details, the output layout, ablations and new MASim worlds are covered in
-[docs/REPRODUCE.md](docs/REPRODUCE.md).
+[docs/REPRODUCE.md](docs/REPRODUCE.md). The two realism tables (App. A.7) also need four third-party dialogue corpora,
+which we do not redistribute; [docs/REPRODUCE.md](docs/REPRODUCE.md#realism-tables) says where to get them.
 
 ## Repository structure
 

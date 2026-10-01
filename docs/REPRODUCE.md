@@ -124,7 +124,24 @@ python scripts/reproduce_figures.py --all --out-dir out/paper_artifacts
 python scripts/reproduce_figures.py --check path/to/paper   # regenerate and diff against a paper checkout
 ```
 
-`experiments_index.csv` maps each cell to its result file under `$MEMARENA_RESULTS_DIR`. To build the main-grid tables and figures from the grid runners' tree instead, pass `--runs-dir out/runs` (or set `MEMARENA_RUNS_DIR`) and choose the judge with `--judge gpt4omini|deepseek` (`MEMARENA_JUDGE`, default `gpt4omini`); cells the judge has not finished are left out. Artifacts built from ablation rows, latency logs or the dataset keep their own inputs. The realism tables also read four external corpora from `$MEMARENA_EXTERNAL_CORPORA` (REALTALK, DailyDialog, PERSONA-CHAT, LoCoMo; see `memarena/realism.py` for the layout and download URLs). The identity-continuity ablation calls no model and runs from the dataset alone; see `experiments/camera_ready/identity_continuity/README.md`.
+`experiments_index.csv` maps each cell to its result file under `$MEMARENA_RESULTS_DIR`. To build the main-grid tables and figures from the grid runners' tree instead, pass `--runs-dir out/runs` (or set `MEMARENA_RUNS_DIR`) and choose the judge with `--judge gpt4omini|deepseek` (`MEMARENA_JUDGE`, default `gpt4omini`); cells the judge has not finished are left out. Artifacts built from ablation rows, latency logs or the dataset keep their own inputs. The realism tables also need four third-party corpora; see [Realism tables](#realism-tables) below. The identity-continuity ablation calls no model and runs from the dataset alone; see `experiments/camera_ready/identity_continuity/README.md`.
+
+### Realism tables
+
+The realism tables (App. A.7, Tables 10–11) compare MemArena-L with four third-party dialogue corpora, which we do not redistribute. Put them under `data/external/`, or point `MEMARENA_EXTERNAL_CORPORA` at another directory with the same layout:
+
+| Corpus | Files | Source |
+|---|---|---|
+| REALTALK | `realtalk/Chat_*.json` | the `Chat_*.json` files of [danny911kr/REALTALK](https://github.com/danny911kr/REALTALK) |
+| DailyDialog | `dd_train.parquet`, `dd_val.parquet`, `dd_test.parquet` | Hugging Face `roskoN/dailydialog` (parquet export) |
+| PERSONA-CHAT | `pc_train.parquet`, `pc_val.parquet` | Hugging Face `bavard/personachat_truecased` (parquet export) |
+| LoCoMo | `locomo10.json` | [snap-research/locomo](https://github.com/snap-research/locomo) (`data/locomo10.json`) |
+
+`DOWNLOAD_URLS` in `memarena/realism.py` gives the download URLs of the last three. Then:
+
+```bash
+python scripts/reproduce_figures.py --name realism --out-dir out/paper_artifacts
+```
 
 ## 4. Generate a new world with MASim
 

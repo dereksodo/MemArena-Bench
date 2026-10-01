@@ -46,22 +46,15 @@ DOWNLOAD_URLS = {
     "locomo10.json": "https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json",
 }
 
-# Where the authors' working copies live; used only when the env var is unset.
-_LEGACY_DIRS = (
-    PROJECT_ROOT / "docs" / "review" / "claude" / "e2_realism" / "_cache",
-    PROJECT_ROOT / "docs" / "review" / "codex" / "experiments" / "realism" / "realtalk" / "data",
-)
-
-
 def _find(name: str) -> Path:
-    roots = [Path(os.environ["MEMARENA_EXTERNAL_CORPORA"])] if os.getenv("MEMARENA_EXTERNAL_CORPORA") else [PROJECT_ROOT / "data" / "external", *_LEGACY_DIRS]
+    roots = [Path(os.getenv("MEMARENA_EXTERNAL_CORPORA") or PROJECT_ROOT / "data" / "external")]
     for root in roots:
         for cand in (root / name, root / "realtalk" if name == "realtalk" else root / name):
             if cand.exists():
                 return cand
         if name == "realtalk" and any(root.glob("Chat_*.json")):
             return root
-    raise FileNotFoundError(f"external corpus '{name}' not found under {[str(r) for r in roots]} (see memarena.realism)")
+    raise FileNotFoundError(f"external corpus '{name}' not found under {[str(r) for r in roots]} (see 'Realism tables' in docs/REPRODUCE.md)")
 
 
 def _dataset_dir() -> Path:

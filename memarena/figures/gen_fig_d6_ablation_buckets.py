@@ -108,11 +108,17 @@ def main():
     stats = _per_cell_buckets()
     write_table(stats)
 
-    # Main-text figure: full text width (5.5 in), fonts at print size.
-    plt.rcParams.update({"font.size": 7, "axes.linewidth": 0.6})
-    fig, ax = plt.subplots(figsize=(5.5, 1.95))
+    # Main-text figure: full text width (5.5 in) and the 1.93 in height the
+    # page reserves, drawn at print size on a fixed canvas (no tight bbox), so
+    # \includegraphics[width=\textwidth] prints every font at its nominal size.
+    FS = 7.0
+    fig_w, fig_h = 5.5, 1.93
+    plt.rcParams.update({"font.size": FS, "axes.linewidth": 0.6})
+    fig = plt.figure(figsize=(fig_w, fig_h))
+    ax_l, ax_r, ax_b, ax_t = 0.37, 5.47, 0.40, 1.66   # inches
+    ax = fig.add_axes([ax_l / fig_w, ax_b / fig_h, (ax_r - ax_l) / fig_w, (ax_t - ax_b) / fig_h])
 
-    bar_w, group_gap = 0.78, 1.1
+    bar_w, group_gap = 0.86, 0.7
     n_readers = len(MODEL_ORDER)
     xs, cell_keys, centers = [], [], []
     for bi, b in enumerate(BACKENDS):
@@ -132,7 +138,7 @@ def main():
 
     # the Oracle group (the only one that surfaces the fact) on a light band
     oi = BACKENDS.index("oracle")
-    ax.axvspan(centers[oi] - n_readers / 2 - 0.1, centers[oi] + n_readers / 2 + 0.1,
+    ax.axvspan(centers[oi] - n_readers / 2 - 0.05, centers[oi] + n_readers / 2 + 0.05,
                color="#fbe9e7", zorder=0, lw=0)
 
     bottom = np.zeros(len(xs))
@@ -145,33 +151,40 @@ def main():
         lk = pct["Leak"][i]
         if lk >= 20:        # leak share printed inside the red segment
             ax.text(xs[i], lk / 2, f"{lk:.0f}", ha="center", va="center",
-                    fontsize=5.6, color="white", fontweight="bold", zorder=3)
+                    fontsize=FS, color="white", fontweight="bold", zorder=3)
         rf = pct["REFUSE"][i]
         if rf >= 3:         # the rare explicit refusals
-            ax.text(xs[i], 101.5, f"{rf:.0f}", ha="center", va="bottom",
-                    fontsize=5.6, color=SEG_COLOR["REFUSE"], fontweight="bold")
+            ax.annotate(f"{rf:.0f}", (xs[i], 100), xytext=(0, 1), textcoords="offset points",
+                        ha="center", va="bottom", fontsize=FS,
+                        color=SEG_COLOR["REFUSE"], fontweight="bold")
 
-    for bi, b in enumerate(BACKENDS):
-        ax.text(centers[bi], 109, BACKEND_LABEL[b], ha="center", va="bottom",
-                fontsize=7.3, fontweight="bold", color="#b71c1c" if b == "oracle" else "#222")
+    for bi, b in enumerate(BACKENDS):   # above the (rare) refusal counts
+        ax.annotate(BACKEND_LABEL[b], (centers[bi], 100), xytext=(0, 9.5),
+                    textcoords="offset points", ha="center", va="bottom", fontsize=7.5,
+                    fontweight="bold", color="#b71c1c" if b == "oracle" else "#222")
 
-    ax.set_xticks(xs)
-    ax.set_xticklabels([READER_SHORT.get(r, r) for (_, r) in cell_keys], fontsize=5.8)
+    # Reader labels at 7 pt are wider than a bar slot for "0.6B"; the tick marks
+    # are hidden, so the first and last label of each group sit slightly outward
+    # (into the gap between groups) to keep a clear space between labels.
+    nudge = {0: -0.17, n_readers - 1: 0.12}
+    ax.set_xticks([x + nudge.get(i % n_readers, 0.0) for i, x in enumerate(xs)])
+    ax.set_xticklabels([READER_SHORT.get(r, r) for (_, r) in cell_keys], fontsize=FS)
     ax.tick_params(axis="x", length=0, pad=1.5)
-    ax.tick_params(axis="y", length=2, width=0.5, labelsize=6)
-    ax.set_xlim(xs[0] - 0.7, xs[-1] + 0.7)
+    ax.tick_params(axis="y", length=2, width=0.5, labelsize=FS, pad=1.5)
+    ax.set_xlim(xs[0] - 0.55, xs[-1] + 0.55)
     ax.set_ylim(0, 100)
     ax.set_yticks([0, 50, 100])
-    ax.set_ylabel("% of DENY items", fontsize=6.8, labelpad=2)
+    ax.set_ylabel("% of DENY items", fontsize=FS, labelpad=2)
     for side in ("top", "right"):
         ax.spines[side].set_visible(False)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.13), ncol=4, fontsize=6.5,
-              frameon=False, handlelength=1.1, handleheight=0.8, columnspacing=1.4)
+    fig.legend(*ax.get_legend_handles_labels(), loc="lower center",
+               bbox_to_anchor=((ax_l + ax_r) / 2 / fig_w, 0.0), ncol=4, fontsize=FS,
+               frameon=False, handlelength=1.1, handleheight=0.8, columnspacing=1.4,
+               borderaxespad=0.2)
 
-    fig.tight_layout(pad=0.2)
     OUT_PDF.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT_PDF, bbox_inches="tight", pad_inches=0.02)
-    fig.savefig(OUT_PNG, bbox_inches="tight", pad_inches=0.02, dpi=300)
+    fig.savefig(OUT_PDF)
+    fig.savefig(OUT_PNG, dpi=300)
     plt.close(fig)
     print(f"Wrote {OUT_PDF}")
     print(f"Wrote {OUT_PNG}")

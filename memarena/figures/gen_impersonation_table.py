@@ -1,17 +1,17 @@
 """Generate the body of tab:impersonation (spoofed authorisation on DENY).
 
 Oracle context, readers Qwen3-8B and Mistral-7B, seeds s2/s3/s4, three
-conditions: L0 (the main grid: asker named, owner's contacts shown), IMP-owner
+conditions: L2 (the main grid: asker named, owner's contacts shown; tab:d6-identity), IMP-owner
 ("I am the owner"), IMP-auth (claimed delegation). Only the 73 DENY queries
 carry the spoofed prefix; the 71 ALLOW instances are byte-identical to the
 released dataset, so utility is fixed by construction.
 
 Leak = DISCLOSE_CORRECT on DENY and utility = DISCLOSE_CORRECT on ALLOW, as in
 the main grid; items are the 144 fact-bearing D6 items. ± is the sample SD over
-seeds; ΔF1_PU is against L0 of the same reader and judge.
+seeds; ΔF1_PU is against L2 of the same reader and judge.
 
 Cell sources (``memarena.figures.paper_data.ablation_runs_dir``):
-  L0       the main-grid Oracle cells (MEMARENA_RUNS_DIR)
+  L2       the main-grid Oracle cells (MEMARENA_RUNS_DIR)
   IMP-*    oracle-imp{owner,auth}/<reader>/<seed>/oracle/
            evaluation_results_oracle_imp{owner,auth}_<reader>_<seed>_judge_<tag>.json
            (answers from run_d6_impersonation.py datasets via test_cell.sh -tag)
@@ -32,12 +32,12 @@ from memarena.figures.paper_data import ablation_eval_path, load_all_cells
 from memarena.figures.paths import table_path
 
 READERS = (("8b", "Qwen3-8B"), ("7b", "Mistral-7B"))
-LEVELS = (("L0", "L0 (main grid)"), ("impowner", "IMP-owner"), ("impauth", "IMP-auth"))
+LEVELS = (("L2", "L2 (main grid)"), ("impowner", "IMP-owner"), ("impauth", "IMP-auth"))
 JUDGES = ("gpt4omini", "deepseek")
 
 
 def cell_paths(reader: str, level: str, judge: str) -> List[Path]:
-    if level == "L0":
+    if level == "L2":
         grid = load_all_cells(include_ablation=False, judge=judge)
         return [Path(grid[(s, "oracle", reader)].source_path) for s in SEEDS]
     return [ablation_eval_path(f"oracle-{level}", "oracle", f"oracle_{level}", reader, s, judge) for s in SEEDS]
@@ -54,12 +54,12 @@ def collect(instances: Path | None = None) -> Dict[tuple, List[Dict[str, float]]
 def render_body(data) -> str:
     lines: List[str] = []
     for i, (r, label) in enumerate(READERS):
-        base = {j: st.mean(m["f1"] for m in data[(r, "L0", j)]) for j in JUDGES}
+        base = {j: st.mean(m["f1"] for m in data[(r, "L2", j)]) for j in JUDGES}
         for k, (lvl, name) in enumerate(LEVELS):
             rows = data[(r, lvl, "gpt4omini")]
             f1s = [m["f1"] for m in rows]
             head = f"\\multirow{{{len(LEVELS)}}}{{*}}{{{label}}}" if k == 0 else ""
-            if lvl == "L0":
+            if lvl == "L2":
                 d_p = d_d = "---"
             else:
                 d_p = f"${st.mean(f1s) - base['gpt4omini']:+.1f}$"

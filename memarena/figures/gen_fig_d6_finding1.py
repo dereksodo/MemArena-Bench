@@ -176,10 +176,33 @@ def _frac(num, den):
     return num / den if den > 0 else float("nan")
 
 
-def _draw_panel_a(ax, tp):
-    """Standalone panel (a): Cause-1 vs Cause-2 quadrant scatter."""
+def _draw_panel_a(ax, tp, compact: bool = False):
+    """Panel (a): Cause-1 vs Cause-2 quadrant scatter.
+
+    ``compact`` draws it for a figure made at its printed size (Fig. 2 of the
+    paper, ~2.3 in wide): 7 pt text, wrapped region labels, smaller markers.
+    The default keeps the layout of the standalone 6.7 in figure.
+    """
     AX_MAX = 1.0
     THRESH = 0.30  # quadrant boundary
+    if compact:
+        fs = 7.0
+        label_cause2 = dict(x=0.32, y=0.985, s="Cause 2: retrieves\nAND leaks\n(Oracle cluster)", ha="left")
+        label_cause1 = dict(x=0.15, y=0.53, s="Cause 1:\npoor\nretrieval", ha="center")
+        label_ideal = dict(x=0.56, y=0.275, s="ideal: retrieves\nAND gates\n(EMPTY)", ha="center")
+        diag = dict(x=0.47, y=0.43, s=r"$y=x$ (policy-blind)", fontsize=fs, rotation=45,
+                    transform_rotates_text=True)
+        star_note = dict(xytext=(0.885, 0.125), fontsize=fs)
+        pt_size, star_size, line_lw = 22, 55, 0.6
+    else:
+        fs = None
+        label_cause2 = dict(x=0.65, y=0.93, s="Cause 2: retrieves AND leaks\n(Oracle cluster)", ha="center", fontsize=12)
+        label_cause1 = dict(x=0.15, y=0.36, s="Cause 1:\npoor retrieval", ha="center", fontsize=11)
+        label_ideal = dict(x=0.65, y=0.27, s="ideal: retrieves AND gates\n(EMPTY)", ha="center", fontsize=12)
+        diag = dict(x=0.55, y=0.50, s=r"$y=x$ (policy-blind)", fontsize=11, rotation=38)
+        star_note = dict(xytext=(0.85, 0.10), fontsize=11)
+        pt_size, star_size, line_lw = 90, 200, 0.8
+    region_fs = {} if fs is None else {"fontsize": fs}
 
     # Quadrant shading. Axes: x = ALLOW DC (retrieval success), y = DENY leak.
     # Ideal corner is BOTTOM-RIGHT (retrieves AND gates), not top-left.
@@ -192,18 +215,14 @@ def _draw_panel_a(ax, tp):
     ax.add_patch(cause2_box)
     ax.add_patch(cause1_box)
     ax.add_patch(ideal_box)
-    ax.text(0.65, 0.93, "Cause 2: retrieves AND leaks\n(Oracle cluster)",
-            fontsize=12, color="#9b1c1c", ha="center", va="top", fontweight="bold")
-    ax.text(0.15, 0.36, "Cause 1:\npoor retrieval",
-            fontsize=11, color="#1c4e9b", ha="center", va="top", fontweight="bold")
-    ax.text(0.65, 0.27, "ideal: retrieves AND gates\n(EMPTY)",
-            fontsize=12, color="#7a5a00", ha="center", va="top", fontweight="bold")
+    ax.text(**label_cause2, **region_fs, color="#9b1c1c", va="top", fontweight="bold")
+    ax.text(**label_cause1, **region_fs, color="#1c4e9b", va="top", fontweight="bold")
+    ax.text(**label_ideal, **region_fs, color="#7a5a00", va="top", fontweight="bold")
 
     # Diagonal y=x (policy-blind reference)
-    diag = np.linspace(0, AX_MAX, 40)
-    ax.plot(diag, diag, color="black", lw=0.8, ls=":", alpha=0.55)
-    ax.text(0.55, 0.50, r"$y=x$ (policy-blind)", fontsize=11, color="#444",
-            rotation=38, rotation_mode="anchor", ha="left", va="top")
+    diag_xy = np.linspace(0, AX_MAX, 40)
+    ax.plot(diag_xy, diag_xy, color="black", lw=line_lw, ls=":", alpha=0.55)
+    ax.text(**diag, color="#444", rotation_mode="anchor", ha="left", va="top")
 
     # Plot 25 cells
     for backend in BACKENDS:
@@ -213,30 +232,41 @@ def _draw_panel_a(ax, tp):
                 continue
             x = _frac(s_tp["allow_dc"], s_tp["allow_total"])
             y = _frac(s_tp["deny_leak"], s_tp["deny_total"])
-            ax.scatter([x], [y], s=90, marker=READER_MARKER[reader],
-                       color=BACKEND_COLOR[backend], edgecolor="white", lw=0.7,
-                       alpha=0.95, zorder=4)
+            ax.scatter([x], [y], s=pt_size, marker=READER_MARKER[reader],
+                       color=BACKEND_COLOR[backend], edgecolor="white",
+                       lw=0.4 if compact else 0.7, alpha=0.95, zorder=4)
 
     # Star at ideal (1, 0) — high retrieval, zero leak
-    ax.scatter([1.0], [0.0], marker="*", s=200, color="#d4af37",
-               edgecolor="black", lw=0.8, zorder=5)
-    ax.annotate("ideal\n(1, 0)", xy=(1.0, 0.0), xytext=(0.85, 0.10),
-                fontsize=11, color="#7a5a00", ha="center",
+    ax.scatter([1.0], [0.0], marker="*", s=star_size, color="#d4af37",
+               edgecolor="black", lw=0.5 if compact else 0.8, zorder=5)
+    ax.annotate("ideal\n(1, 0)", xy=(1.0, 0.0), **star_note,
+                color="#7a5a00", ha="center",
                 arrowprops=dict(arrowstyle="-", lw=0.6, color="#7a5a00"))
 
     ax.set_xlim(-0.02, 1.02)
     ax.set_ylim(-0.02, 1.02)
     ax.set_xlabel(r"Correct-disclosure rate on ALLOW (retrieval $\rightarrow$)",
-                  fontsize=12)
-    ax.set_ylabel(r"Fact-leak rate on DENY (failed to gate $\rightarrow$)",
-                  fontsize=12)
-    ax.tick_params(labelsize=11)
+                  fontsize=fs or 12, labelpad=2 if compact else None)
+    # The compact panel is too short for the y label on one line.
+    ax.set_ylabel(("Fact-leak rate on DENY\n" if compact else "Fact-leak rate on DENY ")
+                  + r"(failed to gate $\rightarrow$)",
+                  fontsize=fs or 12, labelpad=2 if compact else None)
+    if compact:
+        ax.tick_params(labelsize=fs, length=2, width=0.5, pad=1.5)
+        for spine in ax.spines.values():
+            spine.set_linewidth(0.6)
+    else:
+        ax.tick_params(labelsize=11)
     ax.grid(alpha=0.2)
+
+
+HEATMAP_FS = 7.0  # the heatmap is drawn at its printed size (0.7\textwidth)
 
 
 def _draw_f1pu_heatmap(ax, stats):
     """Standalone F1_PU heatmap: seed-mean D6 per cell, identical to the D6
     column of tab:results-L-full (``memarena.figures.main_grid``)."""
+    fs = HEATMAP_FS
     grid_arr = np.full((len(BACKENDS), len(MODEL_ORDER)), np.nan)
     for i, backend in enumerate(BACKENDS):
         for j, reader in enumerate(MODEL_ORDER):
@@ -244,23 +274,26 @@ def _draw_f1pu_heatmap(ax, stats):
     im = ax.imshow(grid_arr, cmap="viridis", vmin=0, vmax=100, aspect="auto")
     ax.set_xticks(range(len(MODEL_ORDER)))
     ax.set_xticklabels([MODEL_TEX[m] for m in MODEL_ORDER], rotation=30, ha="right",
-                       fontsize=9)
+                       rotation_mode="anchor", fontsize=fs)
     ax.set_yticks(range(len(BACKENDS)))
-    ax.set_yticklabels([BACKEND_LABEL[b] for b in BACKENDS], fontsize=10)
+    ax.set_yticklabels([BACKEND_LABEL[b] for b in BACKENDS], fontsize=fs)
+    ax.tick_params(length=2, width=0.5, pad=1.5)
+    for spine in ax.spines.values():
+        spine.set_linewidth(0.6)
     for i in range(len(BACKENDS)):
         for j in range(len(MODEL_ORDER)):
             v = grid_arr[i, j]
             if np.isnan(v):
-                ax.text(j, i, "--", ha="center", va="center", color="white", fontsize=10)
+                ax.text(j, i, "--", ha="center", va="center", color="white", fontsize=fs + 0.5)
             else:
                 color = "white" if v < 55 else "black"
-                ax.text(j, i, f"{v:.0f}", ha="center", va="center", color=color, fontsize=10)
+                ax.text(j, i, f"{v:.0f}", ha="center", va="center", color=color, fontsize=fs + 0.5)
     oracle_i = BACKENDS.index("oracle")
     n_cols = len(MODEL_ORDER)
     ax.add_patch(plt.Rectangle((-0.5, oracle_i - 0.5), n_cols, 1,
-                               fill=False, edgecolor="black", lw=1.8, zorder=5))
+                               fill=False, edgecolor="black", lw=1.2, zorder=5))
     ax.set_title(r"$\mathrm{F1}_\mathrm{PU}$ per cell  (Oracle row boxed)",
-                 fontsize=11)
+                 fontsize=8, pad=3)
     return im
 
 
@@ -302,14 +335,19 @@ def main():
     # ====================================================================
     # Standalone F1_PU heatmap — for appendix
     # ====================================================================
-    fig_c, ax_c = plt.subplots(figsize=(6.0, 4.0))
+    # Fixed canvas at the printed size (0.7\textwidth = 3.85 in, 2.55 in tall),
+    # so the 7 pt labels print at 7 pt.
+    hm_w, hm_h = 3.85, 2.55
+    fig_c = plt.figure(figsize=(hm_w, hm_h))
+    ax_c = fig_c.add_axes([0.64 / hm_w, 0.47 / hm_h, 2.64 / hm_w, 1.86 / hm_h])
+    cax = fig_c.add_axes([3.37 / hm_w, 0.47 / hm_h, 0.11 / hm_w, 1.86 / hm_h])
     im = _draw_f1pu_heatmap(ax_c, main_grid_stats())
-    cbar = plt.colorbar(im, ax=ax_c, fraction=0.045, pad=0.04)
-    cbar.set_label(r"$\mathrm{F1}_\mathrm{PU}$ (%)", fontsize=9)
-    cbar.ax.tick_params(labelsize=8)
-    fig_c.tight_layout()
-    fig_c.savefig(F1PU_PDF, bbox_inches="tight")
-    fig_c.savefig(F1PU_PNG, bbox_inches="tight", dpi=160)
+    cbar = fig_c.colorbar(im, cax=cax)
+    cbar.set_label(r"$\mathrm{F1}_\mathrm{PU}$ (%)", fontsize=HEATMAP_FS, labelpad=2)
+    cbar.ax.tick_params(labelsize=HEATMAP_FS, length=2, width=0.5, pad=1.5)
+    cbar.outline.set_linewidth(0.6)
+    fig_c.savefig(F1PU_PDF)
+    fig_c.savefig(F1PU_PNG, dpi=300)
     plt.close(fig_c)
     print(f"Wrote {F1PU_PDF}")
     print(f"Wrote {F1PU_PNG}")

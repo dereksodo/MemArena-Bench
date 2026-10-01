@@ -17,8 +17,8 @@ retries up to 3x with a short backoff. Empty predictions are short-circuited
 (no API call) per ``_score_d4_armB``.
 
 Judge: ``--judge-model`` (default openai/gpt-4o-mini-2024-07-18, the paper's).
-DeepSeek models are called with reasoning on and a 4096-token budget
-(``memarena.judges.judge_request_kwargs``); prompts, temperature 0 and parsing
+DeepSeek models are called with reasoning on, an 8,192-token budget and routing pinned to
+DeepSeek's own endpoint (``memarena.judges.judge_request_kwargs``); prompts, temperature 0 and parsing
 are the same for every judge.
 
 Idempotency: if a record already has the new vocabulary in ``policy_category``
@@ -296,7 +296,7 @@ def main() -> int:
                         help="judge requests in flight, shared by all cells (default 128)")
     parser.add_argument("--judge-model", default=DEFAULT_JUDGE_MODEL,
                         help=f"judge model (default {DEFAULT_JUDGE_MODEL}; DeepSeek models run with "
-                             "reasoning on, 4096 tokens)")
+                             "reasoning on, 8192 tokens)")
     parser.add_argument("--eval-path", type=Path, action="append", default=None,
                         help="Relabel only this evaluation_results_*.json (repeatable) "
                              "instead of the cells in experiments_index.csv. Used by "

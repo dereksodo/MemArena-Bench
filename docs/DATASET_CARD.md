@@ -60,7 +60,8 @@ configs:
 > **MemArena**: An Ego-Centric Benchmark for On-Device Agentic Personal Memory
 > Assistants at Scale.
 > Jiadong Zhang, Xiaosong Ma, MBZUAI, 2026.
-> Accepted at NeurIPS 2026 (Evaluations and Datasets Track); paper: [arXiv:2608.02613](https://arxiv.org/abs/2608.02613).
+> Accepted at NeurIPS 2026 (Evaluations and Datasets Track); paper: [arXiv:2608.02613](https://arxiv.org/abs/2608.02613);
+> code: [github.com/dereksodo/MemArena-Bench](https://github.com/dereksodo/MemArena-Bench).
 
 ## 1. Summary
 
@@ -254,10 +255,11 @@ Run configuration archived in `pipeline_report.json → config` (full dump).
 
 ## 6. Baseline results
 
-Aggregate baseline scores for 5 on-device models × 5 backends × 4 seeds are
+Aggregate baseline scores for 5 on-device models × 5 backends × 3 seeds are
 reported in the companion MemArena paper. Per-instance model outputs and
 judge rationales are not distributed; users can reproduce them with the
-evaluation code and the cleaned corpus shipped here.
+evaluation code at [github.com/dereksodo/MemArena-Bench](https://github.com/dereksodo/MemArena-Bench)
+and the cleaned corpus shipped here.
 
 ## 7. Citation
 
@@ -277,6 +279,9 @@ evaluation code and the cleaned corpus shipped here.
 CC BY 4.0 — see `LICENSE`. You may share and adapt with attribution.
 
 ## 9. Changelog
+
+### Card update (2026-10-02)
+- Baseline results: three seeds (s2–s4), as in the paper; links to the code repository.
 
 ### Card update (2026-09-30)
 - Removed the 56 fact-less behavioural probes from `d4_permission`, which no metric scored: 144 items, 1,523 evaluation instances in total. The 144 fact items, their ids and ground truth are unchanged.

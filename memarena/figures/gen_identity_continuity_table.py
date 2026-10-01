@@ -6,6 +6,13 @@ and reports, for the renaming artefact (raw - sham) and the effect
 (break - sham), the ego-clustered paired-bootstrap delta and 95% CI of the
 normalised first-gold rank and GoldRecall@10.
 
+Only released items are scored: D6 (``d4_permission``) rows are restricted to the
+fact-bearing population of ``eval.src.permission_metrics`` (the 144 released
+items, whether the instances file is the release or the 200-item pre-release
+copy). The results behind the paper were computed on the released instances, so
+the filter changes nothing for them; it keeps a results file built on the
+pre-release pool, whose 56 fact-less D6 items the release drops, from scoring them.
+
     python -m memarena.figures.gen_identity_continuity_table
 """
 from __future__ import annotations
@@ -16,6 +23,8 @@ import sys
 from pathlib import Path
 from typing import List
 
+from eval.src.permission_metrics import POPULATION_FACT, load_instances, population_ids
+from memarena.figures.main_grid import default_instances_path
 from memarena.figures.paper_data import PROJECT_ROOT, RESULTS_ROOT
 from memarena.figures.paths import table_path
 
@@ -24,8 +33,15 @@ from e2_analyze import contrast, paired_by_item  # noqa: E402
 
 RESULTS = RESULTS_ROOT / "out" / "identity_continuity" / "identity_results_bm25.json"
 PRIMARY = "nr_first"
+D6_DIM = "d4_permission"
 ROWS = (("raw", r"\textit{raw} $-$ \textit{sham} (renaming artefact)"),
         ("break", r"\textbf{\textit{break} $-$ \textit{sham} (the effect)}"))
+
+
+def released_rows(rows: list, instances: Path | None = None) -> list:
+    """Drop the D6 items outside the released, fact-bearing population."""
+    keep = population_ids(load_instances(instances or default_instances_path()), POPULATION_FACT)
+    return [r for r in rows if r["dim"] != D6_DIM or r["iid"] in keep]
 
 
 def contrasts(rows: list) -> dict:
@@ -47,15 +63,18 @@ def render(res: dict) -> str:
 def main(argv: List[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Generate the identity-continuity table body.")
     ap.add_argument("--data", type=Path, default=RESULTS)
+    ap.add_argument("--instances", type=Path, default=None)
     ap.add_argument("--out", type=Path, default=None)
     args = ap.parse_args(argv)
     blob = json.loads(args.data.read_text())
-    res = contrasts(blob["rows"])
+    rows = released_rows(blob["rows"], args.instances)
+    res = contrasts(rows)
     out = args.out or table_path("identity_continuity_body.tex")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render(res), encoding="utf-8")
-    n_items = len({r["iid"] for r in blob["rows"]})
-    print(f"[gen_identity_continuity_table] items={n_items} seeds={blob['seeds']} "
+    n_items = len({r["iid"] for r in rows})
+    n_d6 = len({r["iid"] for r in rows if r["dim"] == D6_DIM})
+    print(f"[gen_identity_continuity_table] items={n_items} (D6 {n_d6}) seeds={blob['seeds']} "
           + "; ".join(f"{a}: NR {res[a][PRIMARY]['delta']:+.4f} R@10 {res[a]['gold_recall10']['delta']:+.4f}" for a, _ in ROWS))
     return 0
 

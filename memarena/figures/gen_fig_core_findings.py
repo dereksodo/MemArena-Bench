@@ -14,6 +14,7 @@ Output: <artifact root>/figures/fig_core_findings.{pdf,png}
 from __future__ import annotations
 
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 import numpy as np
 
 # Reuse data + drawing helpers from the standalone d6 script.
@@ -78,33 +79,28 @@ def draw_panel_b(ax) -> None:
            label="Memory search")
     ax.bar(x, prefill, width=0.85, bottom=search, color=PREFILL_COLOR,
            edgecolor="white", lw=0.4, label="LLM prefill")
-    # Headroom above the tallest bar for the legend, the group labels and the
-    # magnifier inset (all inside the axes).
-    ymax = max(total) * 1.45
+    # Headroom above the tallest bar for the group labels and the magnifier inset
+    # (the legend sits with panel A's under the figure).
+    ymax = max(total) * 1.27
     for xi, t in zip(x, total):
         ax.text(xi, t + ymax * 0.01, f"{t}", ha="center", va="bottom",
                 fontsize=FS, color="#333")
     ax.set_xlim(x[0] - 0.55, x[-1] + 0.6)
-    # Backend names alternate between two rows so they stay horizontal at 7 pt
-    # without overlapping (the bars are ~18 pt apart).
+    # Backend names slanted, so they fit at 7 pt under bars ~18 pt apart.
     ax.set_xticks(x)
-    ax.set_xticklabels([lab if i % 2 == 0 else "\n" + lab for i, lab in enumerate(labels)],
-                       fontsize=FS, linespacing=1.15)
+    ax.set_xticklabels(labels, fontsize=FS, rotation=25, ha="right", rotation_mode="anchor")
     ax.tick_params(axis="x", length=0, pad=2)
     ax.tick_params(axis="y", labelsize=FS, length=2, width=0.5, pad=1.5)
     for spine in ax.spines.values():
         spine.set_linewidth(0.6)
-    # Group labels (Qwen3-0.6B / Qwen3-32B-AWQ) under the legend row.
-    ax.text(0.29, 0.875, "Qwen3-0.6B", transform=ax.transAxes,
+    # Group labels (Qwen3-0.6B / Qwen3-32B-AWQ) along the top of the axes.
+    ax.text(0.29, 0.97, "Qwen3-0.6B", transform=ax.transAxes,
             ha="center", va="top", fontsize=FS, fontweight="bold", color="#222")
-    ax.text(0.79, 0.875, "Qwen3-32B-AWQ", transform=ax.transAxes,
+    ax.text(0.79, 0.97, "Qwen3-32B-AWQ", transform=ax.transAxes,
             ha="center", va="top", fontsize=FS, fontweight="bold", color="#222")
     ax.axvline((x[3] + x[4]) / 2, color="#bbbbbb", lw=0.6, ls="--", alpha=0.8)
     ax.set_ylabel("End-to-end TTFT (ms)", fontsize=FS, labelpad=2)
     ax.set_ylim(0, ymax)
-    ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=2,
-              fontsize=FS, frameon=False, handlelength=1.4, handleheight=0.8,
-              handletextpad=0.4, columnspacing=1.2, borderaxespad=0.25)
     ax.grid(axis="y", alpha=0.18)
 
     # === Magnifier inset over the 0.6B bars =================================
@@ -114,7 +110,7 @@ def draw_panel_b(ax) -> None:
     src_x0, src_x1 = -0.55, 3.55
     src_y0, src_y1 = 0.0, max(total[:4]) * 1.22
     axins = ax.inset_axes(
-        [0.135, 0.215, 0.33, 0.47],   # [x, y, w, h] in axes fraction
+        [0.135, 0.20, 0.33, 0.56],   # [x, y, w, h] in axes fraction
         xlim=(src_x0, src_x1), ylim=(src_y0, src_y1),
     )
     axins.bar(x[:4], search[:4], width=0.85, color=SEARCH_COLOR,
@@ -145,7 +141,7 @@ def main() -> None:
     # Fixed layout in inches (no tight bbox), so the PDF is exactly
     # FIG_W x FIG_H and \includegraphics[width=\textwidth] prints it 1:1.
     fig = plt.figure(figsize=(FIG_W, FIG_H))
-    ax_bottom, ax_top = 0.66, FIG_H - 0.20
+    ax_bottom, ax_top = 0.72, FIG_H - 0.20
     ax_h = (ax_top - ax_bottom) / FIG_H
     ax_a = fig.add_axes([0.49 / FIG_W, ax_bottom / FIG_H, 2.09 / FIG_W, ax_h])
     ax_b = fig.add_axes([3.01 / FIG_W, ax_bottom / FIG_H, 2.35 / FIG_W, ax_h])
@@ -153,9 +149,8 @@ def main() -> None:
     # Panel A — scatter
     _draw_panel_a(ax_a, tp, compact=True)
 
-    # Panel A legend at the bottom left of the figure: backends on row 1
-    # (colour), readers on row 2 (marker). At 7 pt it is wider than panel A, so
-    # it runs on under panel B; panel B carries its own legend inside its axes.
+    # One legend under both panels: backends on row 1 (colour), readers on row 2
+    # (marker), and panel B's two bar segments as the last column.
     backend_handles = [plt.Line2D([0], [0], marker="o", lw=0, markersize=5,
                                   markerfacecolor=BACKEND_COLOR[b],
                                   markeredgecolor="white", markeredgewidth=0.4,
@@ -164,12 +159,14 @@ def main() -> None:
                                  markersize=4.5, color="black", markeredgewidth=0.6,
                                  markerfacecolor="white",
                                  label=MODEL_TEX[r]) for r in MODEL_ORDER]
-    # ncol=5 fills column-wise, so interleave to get backends on row 1, readers on row 2.
-    handles = [h for pair in zip(backend_handles, reader_handles) for h in pair]
-    leg = fig.legend(handles=handles, loc="lower left", bbox_to_anchor=(0.03 / FIG_W, 0.0),
-                     ncol=5, fontsize=FS, frameon=False, handletextpad=0.25,
-                     columnspacing=1.1, labelspacing=0.35, borderaxespad=0.15,
-                     handlelength=1.0)
+    bar_handles = [Patch(facecolor=SEARCH_COLOR, edgecolor="none", label="Memory search"),
+                   Patch(facecolor=PREFILL_COLOR, edgecolor="none", label="LLM prefill")]
+    # ncol=6 fills column-wise, so interleave to get backends on row 1, readers on row 2.
+    handles = [h for pair in zip(backend_handles, reader_handles) for h in pair] + bar_handles
+    leg = fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 0.0),
+                     ncol=6, fontsize=FS, frameon=False, handletextpad=0.25,
+                     columnspacing=0.9, labelspacing=0.35, borderaxespad=0.15,
+                     handlelength=1.0, handleheight=0.7)
 
     # Panel B — TTFT bars
     draw_panel_b(ax_b)

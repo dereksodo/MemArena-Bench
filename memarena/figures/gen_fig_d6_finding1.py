@@ -187,18 +187,18 @@ def _draw_panel_a(ax, tp, compact: bool = False):
     THRESH = 0.30  # quadrant boundary
     if compact:
         fs = 7.0
-        label_cause2 = dict(x=0.32, y=0.985, s="Cause 2: retrieves\nAND leaks\n(Oracle cluster)", ha="left")
-        label_cause1 = dict(x=0.15, y=0.53, s="Cause 1:\npoor\nretrieval", ha="center")
-        label_ideal = dict(x=0.56, y=0.275, s="ideal: retrieves\nAND gates\n(EMPTY)", ha="center")
+        label_cause2 = dict(x=0.32, y=0.985, s="Cause 2: surfaces\nAND leaks\n(Oracle cluster)", ha="left")
+        label_cause1 = dict(x=0.15, y=0.53, s="Cause 1:\nfact not\nsurfaced", ha="center")
+        label_ideal = dict(x=0.56, y=0.275, s="ideal: surfaces\nAND gates\n(EMPTY)", ha="center")
         diag = dict(x=0.47, y=0.43, s=r"$y=x$ (policy-blind)", fontsize=fs, rotation=45,
                     transform_rotates_text=True)
         star_note = dict(xytext=(0.885, 0.125), fontsize=fs)
         pt_size, star_size, line_lw = 22, 55, 0.6
     else:
         fs = None
-        label_cause2 = dict(x=0.65, y=0.93, s="Cause 2: retrieves AND leaks\n(Oracle cluster)", ha="center", fontsize=12)
-        label_cause1 = dict(x=0.15, y=0.36, s="Cause 1:\npoor retrieval", ha="center", fontsize=11)
-        label_ideal = dict(x=0.65, y=0.27, s="ideal: retrieves AND gates\n(EMPTY)", ha="center", fontsize=12)
+        label_cause2 = dict(x=0.65, y=0.93, s="Cause 2: surfaces AND leaks\n(Oracle cluster)", ha="center", fontsize=12)
+        label_cause1 = dict(x=0.15, y=0.36, s="Cause 1:\nfact not surfaced", ha="center", fontsize=11)
+        label_ideal = dict(x=0.65, y=0.27, s="ideal: surfaces AND gates\n(EMPTY)", ha="center", fontsize=12)
         diag = dict(x=0.55, y=0.50, s=r"$y=x$ (policy-blind)", fontsize=11, rotation=38)
         star_note = dict(xytext=(0.85, 0.10), fontsize=11)
         pt_size, star_size, line_lw = 90, 200, 0.8
@@ -245,7 +245,7 @@ def _draw_panel_a(ax, tp, compact: bool = False):
 
     ax.set_xlim(-0.02, 1.02)
     ax.set_ylim(-0.02, 1.02)
-    ax.set_xlabel(r"Correct-disclosure rate on ALLOW (retrieval $\rightarrow$)",
+    ax.set_xlabel(r"Correct-disclosure rate on ALLOW (utility $\rightarrow$)",
                   fontsize=fs or 12, labelpad=2 if compact else None)
     # The compact panel is too short for the y label on one line.
     ax.set_ylabel(("Fact-leak rate on DENY\n" if compact else "Fact-leak rate on DENY ")

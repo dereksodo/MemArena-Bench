@@ -279,7 +279,7 @@ start_one() {
       docker rm -f "$name" >/dev/null
     else
       echo "[sglang] ERROR: container already exists: ${name}" >&2
-      echo "[sglang] Set REPLACE_EXISTING=1 or run: $0 stop" >&2
+      echo "[sglang] Set REPLACE_EXISTING=1 or run: $0 stop ${tag}" >&2
       exit 2
     fi
   fi
@@ -444,6 +444,17 @@ start_selected() {
   print_endpoints "${REQUESTED_MODEL_SPECS[@]}"
 }
 
+# Port and GPUs a container was really started with (overrides may differ from MODEL_SPECS).
+container_port_gpus() {
+  local name="$1" port="$2" gpus="$3" actual
+  actual="$(docker inspect -f '{{range $p, $b := .HostConfig.PortBindings}}{{(index $b 0).HostPort}}{{end}}|{{range .HostConfig.DeviceRequests}}{{join .DeviceIDs ","}}{{end}}' "$name" 2>/dev/null)" || actual=""
+  if [[ -n "$actual" ]]; then
+    [[ -n "${actual%%|*}" ]] && port="${actual%%|*}"
+    [[ -n "${actual#*|}" ]] && gpus="${actual#*|}"
+  fi
+  printf '%s|%s' "$port" "$gpus"
+}
+
 status_all() {
   local spec tag served_model container_model_path port gpus name state
   require_docker
@@ -452,6 +463,7 @@ status_all() {
     IFS='|' read -r tag served_model container_model_path port gpus <<<"$spec"
     name="$(container_name "$tag")"
     state="$(docker inspect -f '{{.State.Status}}' "$name" 2>/dev/null || printf 'missing')"
+    IFS='|' read -r port gpus <<<"$(container_port_gpus "$name" "$port" "$gpus")"
     printf '%-8s %-24s %-10s %-22s %s\n' "$tag" "$name" "$state" "http://localhost:${port}" "$gpus"
   done
 }
@@ -466,6 +478,7 @@ status_selected() {
     IFS='|' read -r tag served_model container_model_path port gpus <<<"$spec"
     name="$(container_name "$tag")"
     state="$(docker inspect -f '{{.State.Status}}' "$name" 2>/dev/null || printf 'missing')"
+    IFS='|' read -r port gpus <<<"$(container_port_gpus "$name" "$port" "$gpus")"
     printf '%-8s %-24s %-10s %-22s %s\n' "$tag" "$name" "$state" "http://localhost:${port}" "$gpus"
   done
 }

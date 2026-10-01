@@ -122,6 +122,19 @@ def _smoke_chat(api_base: str, model: str, timeout_s: int) -> None:
         )
 
 
+def _served_model(api_base: str, models_payload: dict[str, Any]) -> dict[str, Any]:
+    """What the server actually serves: the /v1/models ids and, for SGLang, the weights path."""
+    ids = [m.get("id") for m in models_payload.get("data") or [] if isinstance(m, dict) and m.get("id")]
+    info: dict[str, Any] = {"served_model_ids": ids}
+    try:
+        resp = requests.get(f"{api_base[:-len('/v1')]}/get_model_info", timeout=5)
+        if resp.ok:
+            info["served_model_path"] = resp.json().get("model_path")
+    except Exception:  # noqa: BLE001 - not an SGLang server, or no such endpoint
+        pass
+    return info
+
+
 def _choose_model(config: dict[str, Any], models_payload: dict[str, Any], override: str | None) -> str:
     if override:
         return override
@@ -400,7 +413,10 @@ def main(argv: list[str] | None = None) -> int:
                          "count, so set graph.n_agents and graph.layers in the config "
                          "(see MASim/configs/memarena_5a10d_5k.yaml)")
     # load the config before --overwrite clears the output directory, so a bad config loses nothing
-    effective_config = _load_yaml_with_base(config_path)
+    try:
+        effective_config = _load_yaml_with_base(config_path)
+    except (FileNotFoundError, ValueError, yaml.YAMLError) as exc:
+        raise SystemExit(f"[run-masim] bad config {config_path}: {exc}") from None
     if args.days is not None:
         effective_config["time_range"] = [0.0, float(args.days)]
         print(f"[run-masim] --days {args.days}: time_range = [0.0, {float(args.days)}]", flush=True)
@@ -417,6 +433,11 @@ def main(argv: list[str] | None = None) -> int:
         models_payload = _wait_for_models(api_base, args.wait_timeout, args.poll_interval)
 
     model = _choose_model(effective_config, models_payload, args.model)
+    served = {} if args.dry_run else _served_model(api_base, models_payload)
+    if served.get("served_model_ids") and model not in served["served_model_ids"]:
+        print(f"[run-masim] note: requests use model name {model!r}; the server reports "
+              f"{served['served_model_ids']} ({served.get('served_model_path') or 'path unknown'}). "
+              "Both are recorded in run_masim_metadata.json.", flush=True)
     llm_cfg = effective_config.setdefault("llm", {})
     if not isinstance(llm_cfg, dict):
         raise SystemExit("config.llm must be a mapping")
@@ -444,6 +465,7 @@ def main(argv: list[str] | None = None) -> int:
             "effective_config": str(effective_path),
             "sglang_url": api_base,
             "model": model,
+            **served,
             "dry_run": args.dry_run,
         },
     )
@@ -481,7 +503,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"[run-masim] validation failed; see {output_dir / 'logs' / 'validate.log'}")
             return rc
 
-    if not args.skip_stats:
+    if not args.skip_stats and not args.stop_after:
         rc = _run_and_tee(
             [sys.executable, "-m", "MASim", "stats", "--run", str(run_dir)],
             output_dir / "logs" / "stats.log",

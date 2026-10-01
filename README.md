@@ -68,7 +68,7 @@ scripts/setup_venv.sh && source scripts/activate_venv.sh
 python scripts/verify_install.py
 ```
 
-Python 3.10–3.12 (tested in CI). Judging uses `openai/gpt-4o-mini-2024-07-18` through OpenRouter; put `OPENROUTER_API_KEY` in
+Python 3.10 or newer (CI runs 3.10–3.12; 3.13 also works; `PYTHON_BIN=... scripts/setup_venv.sh` picks the interpreter). Judging uses `openai/gpt-4o-mini-2024-07-18` through OpenRouter; put `OPENROUTER_API_KEY` in
 `.env` (see [`.env.example`](.env.example)).
 
 ## Quick start

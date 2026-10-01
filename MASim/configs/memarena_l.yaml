@@ -24,3 +24,6 @@ graph:
 n_events: 75
 sessions_per_day_per_agent: 18  # bumped from 15 to hit ~10K tok/person/day
 time_range: [0.0, 15.0]
+
+# Reproduce the released D6 items: probes are drawn, then dropped (ground_truth/d4_permission.py).
+d6_probes: drop_after_sampling

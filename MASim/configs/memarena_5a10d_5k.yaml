@@ -31,3 +31,9 @@ sessions_per_day_per_agent: 4
 target_tokens: 0
 time_range: [0.0, 10.0]
 day_length: 1.0
+
+# Evaluation size for a small world (5 agents x 10 days): at most 40 items per task file
+# (a file that reaches the cap is trimmed to 85%, i.e. 34); MemArena-L uses 200.
+max_instances_per_dim: 40
+hardening:
+  max_instances_per_dim: 40

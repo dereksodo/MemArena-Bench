@@ -57,8 +57,8 @@ configs:
 
 # MemArena-L v1.0.0 — Dataset Card
 
-> **MemArena**: An Ego-Centric Benchmark for Multi-User Agentic Memory on
-> On-Device Open-Weight Models.
+> **MemArena**: An Ego-Centric Benchmark for On-Device Agentic Personal Memory
+> Assistants at Scale.
 > Jiadong Zhang, Xiaosong Ma, MBZUAI, 2026.
 > Accepted at NeurIPS 2026 (Evaluations and Datasets Track); paper: [arXiv:2608.02613](https://arxiv.org/abs/2608.02613).
 

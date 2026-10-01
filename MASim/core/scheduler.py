@@ -527,6 +527,10 @@ class DailyScheduler:
 
             location = evt.location_id or ""
             conv_duration = day_length * 0.04  # ~1 hour in a 24h day
+            # a conversation must end inside the event's day (and so inside time_range)
+            day_end = (int(evt.timestamp // day_length) + 1) * day_length
+            if evt.timestamp + conv_duration > day_end:
+                continue
 
             evt_domain = getattr(evt, "interest_domain", "") or ""
 
@@ -554,6 +558,8 @@ class DailyScheduler:
                 n_pairs = min(len(all_pairs), 5)
                 for i, (a, b) in enumerate(all_pairs[:n_pairs]):
                     t_offset = i * conv_duration * 0.5
+                    if evt.timestamp + t_offset + conv_duration > day_end:
+                        break
                     specs.append(ConversationSpec(
                         spec_id=f"spec_evt_{uuid.uuid4().hex[:8]}",
                         participants=sorted([a, b]),

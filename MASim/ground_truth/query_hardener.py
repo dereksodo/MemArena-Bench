@@ -37,6 +37,10 @@ log = get_logger(__name__)
 # Config
 # ---------------------------------------------------------------------------
 
+# Paraphrase samples per query: an empty or rejected first paraphrase gets one more try.
+PARAPHRASE_ATTEMPTS = 2
+
+
 @dataclass
 class HardeningConfig:
     paraphrase_enabled: bool = True
@@ -313,31 +317,48 @@ class QueryHardener:
         ]
 
         log.info("Paraphrasing %d queries via LLM batch...", len(prompts))
-        responses = self.llm.generate_batch(prompts)
+        responses = list(self.llm.generate_batch(prompts))
 
+        # An empty or rejected paraphrase gets one more sample (PARAPHRASE_ATTEMPTS in total).
         n_replaced = 0
-        for inst, rephrased in zip(to_paraphrase, responses):
-            rephrased = clean_llm_text(rephrased)
-            if not rephrased:
-                continue
+        pending = list(range(len(to_paraphrase)))
+        for attempt in range(PARAPHRASE_ATTEMPTS):
+            if attempt:
+                if not pending:
+                    break
+                log.info("Re-sampling %d empty or rejected paraphrases", len(pending))
+                for i, resp in zip(pending, self.llm.generate_batch([prompts[i] for i in pending])):
+                    responses[i] = resp
+            still_pending = []
+            for i in pending:
+                inst = to_paraphrase[i]
+                rephrased = clean_llm_text(responses[i])
+                if not rephrased:
+                    inst.metadata["paraphrase_rejected"] = True
+                    still_pending.append(i)
+                    continue
 
-            # Compute overlap with the original source text in ground_truth
-            source_text = self._extract_source_text(inst)
-            overlap = _jaccard(rephrased, source_text) if source_text else 0.0
+                # Compute overlap with the original source text in ground_truth
+                source_text = self._extract_source_text(inst)
+                overlap = _jaccard(rephrased, source_text) if source_text else 0.0
 
-            d6_problems = d4_permission.paraphrase_problems(inst, rephrased)
-            if overlap <= self.cfg.max_lexical_overlap and not d6_problems:
-                inst.metadata["original_query"] = inst.query
-                inst.metadata["lexical_overlap_score"] = round(overlap, 4)
-                inst.metadata["hardened_query"] = rephrased
-                inst.query = rephrased
-                n_replaced += 1
-            else:
-                # Keep original but record the failed attempt
-                inst.metadata["paraphrase_rejected"] = True
-                inst.metadata["paraphrase_overlap"] = round(overlap, 4)
-                if d6_problems:
-                    inst.metadata["paraphrase_rejected_checks"] = d6_problems
+                d6_problems = d4_permission.paraphrase_problems(inst, rephrased)
+                if overlap <= self.cfg.max_lexical_overlap and not d6_problems:
+                    for key in ("paraphrase_rejected", "paraphrase_overlap", "paraphrase_rejected_checks"):
+                        inst.metadata.pop(key, None)
+                    inst.metadata["original_query"] = inst.query
+                    inst.metadata["lexical_overlap_score"] = round(overlap, 4)
+                    inst.metadata["hardened_query"] = rephrased
+                    inst.query = rephrased
+                    n_replaced += 1
+                else:
+                    # Keep original but record the failed attempt
+                    inst.metadata["paraphrase_rejected"] = True
+                    inst.metadata["paraphrase_overlap"] = round(overlap, 4)
+                    if d6_problems:
+                        inst.metadata["paraphrase_rejected_checks"] = d6_problems
+                    still_pending.append(i)
+            pending = still_pending
 
         log.info("Paraphrased %d / %d queries (%.0f%%)",
                  n_replaced, len(to_paraphrase),

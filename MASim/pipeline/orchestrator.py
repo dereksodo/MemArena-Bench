@@ -210,6 +210,9 @@ class PipelineConfig:
     # GT & Eval
     max_instances_per_dim: int = 200
     gt_cutoff_ratio: float = 0.85  # keep 85% when a dimension hits its cap
+    # D6 probe mode (ground_truth/d4_permission.py): "exclude" never draws the fact-less probes;
+    # "drop_after_sampling" reproduces MemArena-L's released items; "include" keeps them.
+    d6_probes: str = "exclude"
     # LLM
     llm: LLMClientConfig = field(default_factory=LLMClientConfig)
     # Multimodal
@@ -298,7 +301,7 @@ class PipelineConfig:
             "conflict_inject_prob", "max_conflicts",
             "permission_inject_prob", "max_permissions",
             "autonomous_privacy_inject_prob", "max_autonomous_privacy",
-            "max_instances_per_dim", "gt_cutoff_ratio",
+            "max_instances_per_dim", "gt_cutoff_ratio", "d6_probes",
             "scheduler_driven", "base_encounter_prob", "day_length",
             "day_completion_ratio", "memory_context_sessions", "facets_enabled",
         ]:
@@ -895,6 +898,7 @@ class Orchestrator:
             permission_gts=permission_gts,
             autonomous_privacy_gts=auto_priv_gts,
             max_per_dimension=self.cfg.max_instances_per_dim,
+            d6_probes=self.cfg.d6_probes,
         )
         eval_instances = _apply_gt_cutoff(
             eval_instances, self.cfg.max_instances_per_dim, self.cfg.gt_cutoff_ratio,
@@ -1243,6 +1247,7 @@ class Orchestrator:
             permission_gts=permission_gts,
             autonomous_privacy_gts=auto_priv_gts,
             max_per_dimension=self.cfg.max_instances_per_dim,
+            d6_probes=self.cfg.d6_probes,
         )
         eval_instances = _apply_gt_cutoff(
             eval_instances, self.cfg.max_instances_per_dim, self.cfg.gt_cutoff_ratio,
@@ -1420,6 +1425,7 @@ class Orchestrator:
             conflict_gts=conflict_gts,
             anaphora_gts=anaphora_gts,
             max_per_dimension=self.cfg.max_instances_per_dim,
+            d6_probes=self.cfg.d6_probes,
         )
         eval_instances = _apply_gt_cutoff(
             eval_instances, self.cfg.max_instances_per_dim, self.cfg.gt_cutoff_ratio,
@@ -2409,7 +2415,7 @@ class Orchestrator:
 
                 # Track token count for target_tokens mode
                 all_day = day_sessions + pa_day_sessions
-                if self.cfg.target_tokens > 0 and all_day:
+                if all_day:  # also logged and checkpointed when target_tokens is off
                     cumulative_tokens += _count_corpus_tokens(all_day)
 
                 total_day = len(all_day)
@@ -3251,6 +3257,11 @@ class Orchestrator:
             self.output_dir / "corpus_sessions.jsonl",
             [s.to_dict() for s in corpus.sessions],
         )
+        # Counts of the corpus as written: the dialogue-stage counts miss the turns injected later.
+        report["n_sessions"] = len(corpus.sessions)
+        report["n_turns"] = sum(len(s.turns) for s in corpus.sessions)
+        report["corpus_tokens"] = _count_corpus_tokens(corpus.sessions)
+        report["d6_probes"] = self.cfg.d6_probes
 
         # Events
         write_jsonl(

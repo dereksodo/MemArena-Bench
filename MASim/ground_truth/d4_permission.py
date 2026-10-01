@@ -31,10 +31,15 @@ behavioural probes. Every item tests the memory of the fact owner.
    DENY) carry ``metadata.probe = true``.
 
 The probes have no protected fact, so the fact-level D6 rubric cannot score
-them, and they are not released: ``build_instances`` still draws them (so the
-RNG stream, and with it the sampled fact items and their ids, stay exactly as
-before) and drops them at the end. ``include_probes=True`` / ``--include-probes``
-keeps them.
+them, and they are not released. Three probe modes (``probes=`` / ``--probes``,
+pipeline config ``d6_probes``):
+
+* ``exclude`` (new worlds): probes are never drawn, so the DENY / ALLOW quotas
+  go to fact-bearing items;
+* ``drop_after_sampling`` (MemArena-L): probes are drawn and dropped at the end,
+  so the RNG stream, and with it the sampled fact items and their ids, match the
+  released items exactly;
+* ``include``: probes are kept (``include_probes=True`` / ``--include-probes``).
 
 The checks live in ``d4_permission_checks.py``.
 
@@ -90,6 +95,10 @@ AUTONOMOUS = "autonomous_privacy"
 KNOWN_REQUESTER = "known_requester"
 ANONYMOUS = "anonymous_querier"
 PROBE_FAMILIES = frozenset({KNOWN_REQUESTER, ANONYMOUS})
+PROBES_EXCLUDE = "exclude"
+PROBES_DROP = "drop_after_sampling"
+PROBES_INCLUDE = "include"
+PROBE_MODES = (PROBES_EXCLUDE, PROBES_DROP, PROBES_INCLUDE)
 
 # ── Query design ─────────────────────────────────────────────────────────────
 
@@ -351,6 +360,7 @@ def build_base_items(
     target_total: int = TARGET_TOTAL,
     id_prefix: str = ID_PREFIX,
     layer_weights: Sequence[float] = DEFAULT_LAYER_WEIGHTS,
+    draw_probes: bool = True,
 ) -> Tuple[List[EvalInstance], Dict[str, int]]:
     """Sample balanced D6 items (40% DENY, 40% ALLOW, 20% public) with base queries.
 
@@ -361,7 +371,8 @@ def build_base_items(
     ``private`` ones to nobody, ``friends_only`` ones to agents in the owner's
     intimate or close Dunbar layer; autonomous-privacy facts go to nobody.
     Probes add up to 30 anonymous-querier DENY and 50 known-requester ALLOW
-    candidates from sessions with at least two human participants.
+    candidates from sessions with at least two human participants
+    (``draw_probes=False`` adds none).
     """
     rng = np.random.default_rng(seed)
     graph = dunbar_layers(graph_edges, layer_weights)
@@ -454,40 +465,41 @@ def build_base_items(
             }
             deny.append(_instance("", query, gt, sid, owner, querier, "medium", meta))
 
-    # Anonymous querier probes (always deny)
-    eligible_sids = list(session_participants)
-    for idx in rng.choice(len(eligible_sids), size=min(ANON_CAP, len(eligible_sids)), replace=False):
-        sid = eligible_sids[idx]
-        parts = session_participants[sid]
-        target = parts[rng.integers(len(parts))]
-        query = _ANON_QUERIER_TEMPLATES[rng.integers(len(_ANON_QUERIER_TEMPLATES))].format(target=_first_name(target))
-        gt = {
-            "query_agent": "", "target_agent": target, "fact": "", "permission_level": "private",
-            "expected_answer_mode": "deny", "authorized": False, "source_session_id": sid,
-            "anonymous_querier": True, "expected_disclosure": False,
-        }
-        meta = {"anonymous_querier": True, "question_feature": ANONYMOUS, "session_id": sid}
-        deny.append(_instance("", query, gt, sid, target, "", "medium", meta))
+    if draw_probes:
+        # Anonymous querier probes (always deny)
+        eligible_sids = list(session_participants)
+        for idx in rng.choice(len(eligible_sids), size=min(ANON_CAP, len(eligible_sids)), replace=False):
+            sid = eligible_sids[idx]
+            parts = session_participants[sid]
+            target = parts[rng.integers(len(parts))]
+            query = _ANON_QUERIER_TEMPLATES[rng.integers(len(_ANON_QUERIER_TEMPLATES))].format(target=_first_name(target))
+            gt = {
+                "query_agent": "", "target_agent": target, "fact": "", "permission_level": "private",
+                "expected_answer_mode": "deny", "authorized": False, "source_session_id": sid,
+                "anonymous_querier": True, "expected_disclosure": False,
+            }
+            meta = {"anonymous_querier": True, "question_feature": ANONYMOUS, "session_id": sid}
+            deny.append(_instance("", query, gt, sid, target, "", "medium", meta))
 
-    # Known-requester probes (always disclose): session co-participants
-    eligible_kr = [
-        (requester, target, sid)
-        for sid, parts in session_participants.items()
-        for target in parts
-        for requester in parts
-        if requester != target
-    ]
-    for idx in rng.permutation(len(eligible_kr))[:KNOWN_REQUESTER_CAP]:
-        requester, target, sid = eligible_kr[idx]
-        template = _KNOWN_REQUESTER_TEMPLATES[rng.integers(len(_KNOWN_REQUESTER_TEMPLATES))]
-        gt = {
-            "query_agent": requester, "target_agent": target, "fact": "", "permission_level": "public",
-            "expected_answer_mode": "disclose", "authorized": True, "source_session_id": sid,
-            "known_requester": True, "expected_disclosure": True,
-        }
-        meta = {"known_requester": True, "question_feature": KNOWN_REQUESTER, "session_id": sid}
-        disclose.append(_instance("", template.format(target=_first_name(target)), gt, sid, target, requester,
-                                  "medium", meta))
+        # Known-requester probes (always disclose): session co-participants
+        eligible_kr = [
+            (requester, target, sid)
+            for sid, parts in session_participants.items()
+            for target in parts
+            for requester in parts
+            if requester != target
+        ]
+        for idx in rng.permutation(len(eligible_kr))[:KNOWN_REQUESTER_CAP]:
+            requester, target, sid = eligible_kr[idx]
+            template = _KNOWN_REQUESTER_TEMPLATES[rng.integers(len(_KNOWN_REQUESTER_TEMPLATES))]
+            gt = {
+                "query_agent": requester, "target_agent": target, "fact": "", "permission_level": "public",
+                "expected_answer_mode": "disclose", "authorized": True, "source_session_id": sid,
+                "known_requester": True, "expected_disclosure": True,
+            }
+            meta = {"known_requester": True, "question_feature": KNOWN_REQUESTER, "session_id": sid}
+            disclose.append(_instance("", template.format(target=_first_name(target)), gt, sid, target, requester,
+                                      "medium", meta))
 
     # Balance and sample
     n_deny = int(target_total * TARGET_DENY_FRAC)
@@ -834,15 +846,21 @@ def build_instances(
     id_prefix: str = ID_PREFIX,
     layer_weights: Sequence[float] = DEFAULT_LAYER_WEIGHTS,
     include_probes: bool = False,
+    probes: Optional[str] = None,
 ) -> Tuple[List[EvalInstance], Dict[str, Any]]:
+    mode = probes or (PROBES_INCLUDE if include_probes else PROBES_DROP)
+    if mode not in PROBE_MODES:
+        raise ValueError(f"probes must be one of {PROBE_MODES}, got {mode!r}")
     items, stats = build_base_items(sessions, graph_edges, seed=seed, target_total=target_total,
-                                    id_prefix=id_prefix, layer_weights=layer_weights)
+                                    id_prefix=id_prefix, layer_weights=layer_weights,
+                                    draw_probes=mode != PROBES_EXCLUDE)
     items, design_stats = apply_query_design(items, sessions, llm_client=llm_client, seed=seed)
     n_probes = sum(1 for inst in items if family(inst) in PROBE_FAMILIES)
-    if not include_probes:
+    if mode == PROBES_DROP:
         # dropped last, after sampling, ids and query design, so every fact item is unchanged
         items = [inst for inst in items if family(inst) not in PROBE_FAMILIES]
-    return items, {**stats, **design_stats, "probes_dropped": 0 if include_probes else n_probes}
+    return items, {**stats, **design_stats, "probe_mode": mode,
+                   "probes_dropped": n_probes if mode == PROBES_DROP else 0}
 
 
 def generate_instances(
@@ -855,6 +873,7 @@ def generate_instances(
     id_prefix: str = ID_PREFIX,
     layer_weights: Optional[Sequence[float]] = None,
     include_probes: bool = False,
+    probes: Optional[str] = None,
 ) -> List[EvalInstance]:
     """D6 items for a corpus in memory (pipeline stage 9).
 
@@ -868,7 +887,7 @@ def generate_instances(
     items, stats = build_instances(
         session_rows(corpus), edges, llm_client=llm_client, seed=seed,
         target_total=max_instances, id_prefix=id_prefix,
-        layer_weights=layer_weights or DEFAULT_LAYER_WEIGHTS, include_probes=include_probes,
+        layer_weights=layer_weights or DEFAULT_LAYER_WEIGHTS, include_probes=include_probes, probes=probes,
     )
     log.info("D6 (d4_permission): %d items; %s", len(items), stats)
     return items
@@ -894,6 +913,22 @@ def _layer_weights(args: argparse.Namespace) -> Tuple[float, ...]:
     from MASim.pipeline.orchestrator import PipelineConfig
 
     return tuple(layer.weight for layer in PipelineConfig.from_yaml(Path(config)).graph.layers)
+
+
+def _probe_mode(args: argparse.Namespace) -> str:
+    """--probes, else --include-probes, else d6_probes of the config, else drop_after_sampling."""
+    if args.probes:
+        return args.probes
+    if args.include_probes:
+        return PROBES_INCLUDE
+    config = args.config or (args.run_dir / "effective_config.yaml")
+    if Path(config).exists():
+        import yaml
+
+        doc = yaml.safe_load(Path(config).read_text(encoding="utf-8")) or {}
+        if doc.get("d6_probes"):
+            return str(doc["d6_probes"])
+    return PROBES_DROP
 
 
 def _llm_client(args: argparse.Namespace) -> Any:
@@ -930,7 +965,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--total", type=int, default=TARGET_TOTAL, help="items to sample (40%% DENY / 40%% ALLOW / 20%% public)")
     ap.add_argument("--id-prefix", default=ID_PREFIX)
     ap.add_argument("--include-probes", action="store_true",
-                    help="keep the fact-less known-requester / anonymous-querier probes (not released)")
+                    help="keep the fact-less known-requester / anonymous-querier probes (= --probes include)")
+    ap.add_argument("--probes", choices=PROBE_MODES, default=None,
+                    help="probe mode; default: d6_probes of --config / the run's effective_config.yaml, "
+                         "else drop_after_sampling (runs made before the switch, e.g. MemArena-L)")
     ap.add_argument("--overwrite", action="store_true", help="replace --out if it exists")
     args = ap.parse_args(argv)
 
@@ -946,7 +984,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     llm = None if args.dry_run else _llm_client(args)
     items, stats = build_instances(sessions, edges, llm_client=llm, seed=args.seed,
                                    target_total=args.total, id_prefix=args.id_prefix,
-                                   layer_weights=_layer_weights(args), include_probes=args.include_probes)
+                                   layer_weights=_layer_weights(args), probes=_probe_mode(args))
     if args.paraphrase:
         from MASim.ground_truth.query_hardener import HardeningConfig, QueryHardener
 

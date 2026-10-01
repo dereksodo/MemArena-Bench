@@ -77,10 +77,6 @@ memarena/human_calibration/sample.json
 # Durable baseline backups (kept before fresh reproduction runs overwrite)
 .reproduction_backups/
 
-# rebuttal working caches (large, regenerable)
-docs/review/e2_realism/_cache/
-docs/review/e3_rejudge/answer_results_*
-docs/review/e3_rejudge/_*.log
 
 # Local build / export artifacts (regenerable; kept out of history for size)
 logs/
@@ -97,8 +93,6 @@ paper_rev0719/refs/
 paper_rev0719/svg-inkscape/
 paper_rev0719/analysis_outputs/
 paper_rev0719/croissant/dist/
-docs/review/codex/experiments/
-docs/review/codex/tmp/
 
 # Machine-local scheduler state
 .claude/scheduled_tasks.lock

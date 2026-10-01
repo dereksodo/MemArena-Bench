@@ -42,6 +42,8 @@ max_permissions: null
 autonomous_privacy_inject_prob: 0.10
 max_autonomous_privacy: null
 max_instances_per_dim: 200
+# D6 probe mode: exclude = never draw the fact-less probes (new worlds); see memarena_l.yaml.
+d6_probes: exclude
 
 hardening:
   paraphrase_enabled: true

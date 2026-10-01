@@ -141,13 +141,31 @@ def cmd_validate(args: argparse.Namespace) -> None:
     else:
         issues.append("Missing eval_instances/ directory")
 
-    # Check corpus sessions
+    # Check corpus sessions (and that they lie inside the run's time_range)
+    time_range = None
+    config_path = run_dir / "effective_config.yaml"
+    if config_path.exists():
+        import yaml
+
+        time_range = (yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}).get("time_range")
     corpus_path = run_dir / "corpus_sessions.jsonl"
     if corpus_path.exists():
         sessions = read_jsonl(corpus_path)
         for i, s in enumerate(sessions):
             if not s.get("turns"):
                 issues.append(f"Session {i}: no turns")
+            if time_range and (s.get("start_time", 0) < time_range[0] or s.get("end_time", 0) > time_range[1]):
+                issues.append(f"Session {s.get('session_id', i)}: {s.get('start_time')}-{s.get('end_time')} "
+                              f"outside time_range {list(time_range)}")
+
+    # Check persona cards (a card whose LLM JSON never parsed is a near-empty placeholder)
+    persona_path = run_dir / "agents_personas.jsonl"
+    if persona_path.exists():
+        for i, row in enumerate(read_jsonl(persona_path)):
+            card = row.get("persona", row)
+            if not card.get("occupation") or card.get("occupation") == "unknown" or not card.get("backstory"):
+                issues.append(f"Persona {row.get('agent_id', i)} ({card.get('name', '')}): "
+                              "missing occupation or backstory")
 
     if issues:
         print(f"Validation found {len(issues)} issue(s):")

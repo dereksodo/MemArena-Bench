@@ -5,8 +5,8 @@ Generates fictional but geographically coherent locations for the simulated city
 coordinate grid.  Transit times are computed from Euclidean distances with
 tiered speed assumptions (walking / mixed / driving).
 
-Results are cached under ``MASim/data/location_cache/`` so identical
-(n_agents, seed) configurations skip regeneration entirely.
+Results are cached under ``MASim/data/location_cache/`` so identical inputs
+(n_agents, seed, and each agent's id, name and occupation) skip regeneration.
 """
 
 from __future__ import annotations
@@ -244,13 +244,20 @@ def _build_coord_transit(
 # Cache helpers
 # ---------------------------------------------------------------------------
 
-def _cache_key(n_agents: int, seed: int) -> str:
-    return f"n{n_agents}_s{seed}.json"
+def _persona_fingerprint(personas: List[PersonaCard], agent_ids: List[str]) -> str:
+    """Hash of the persona fields the layout depends on (id, name, occupation), so a
+    world with different personas never reuses another world's locations."""
+    blob = json.dumps([[aid, p.name, p.occupation] for aid, p in zip(agent_ids, personas)], ensure_ascii=False)
+    return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
 
 
-def _load_cache(n_agents: int, seed: int) -> dict | None:
+def _cache_key(n_agents: int, seed: int, fingerprint: str) -> str:
+    return f"n{n_agents}_s{seed}_{fingerprint}.json"
+
+
+def _load_cache(n_agents: int, seed: int, fingerprint: str) -> dict | None:
     """Return cached dict or None if miss / version mismatch."""
-    path = _CACHE_DIR / _cache_key(n_agents, seed)
+    path = _CACHE_DIR / _cache_key(n_agents, seed, fingerprint)
     if not path.exists():
         return None
     try:
@@ -264,9 +271,9 @@ def _load_cache(n_agents: int, seed: int) -> dict | None:
         return None
 
 
-def _write_cache(n_agents: int, seed: int, payload: dict) -> None:
+def _write_cache(n_agents: int, seed: int, fingerprint: str, payload: dict) -> None:
     _CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    path = _CACHE_DIR / _cache_key(n_agents, seed)
+    path = _CACHE_DIR / _cache_key(n_agents, seed, fingerprint)
     payload["version"] = _CACHE_VERSION
     path.write_text(json.dumps(payload, indent=1))
     log.info("Wrote location cache to %s", path)
@@ -299,7 +306,8 @@ class LocationFactory:
         deterministic path (no LLM calls).
         """
         n_agents = len(personas)
-        cached = _load_cache(n_agents, self.seed)
+        fingerprint = _persona_fingerprint(personas, agent_ids)
+        cached = _load_cache(n_agents, self.seed, fingerprint)
         if cached is not None:
             log.info("Loaded %d locations from cache (n=%d, seed=%d).",
                      len(cached["locations"]), n_agents, self.seed)
@@ -308,7 +316,7 @@ class LocationFactory:
         locations, transit_matrix, coords = self._build_locations(personas, agent_ids)
 
         # Write cache
-        _write_cache(n_agents, self.seed, {
+        _write_cache(n_agents, self.seed, fingerprint, {
             "locations": [loc.to_dict() for loc in locations],
             "transit_matrix": transit_matrix,
             "coords": {k: list(v) for k, v in coords.items()},

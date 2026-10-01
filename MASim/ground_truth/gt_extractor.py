@@ -41,6 +41,7 @@ class GTExtractor:
         permission_gts: Optional[List[PermissionGT]] = None,
         autonomous_privacy_gts: Optional[List[AutonomousPrivacyGT]] = None,
         max_per_dimension: int = 200,
+        d6_probes: str = "exclude",
     ) -> Dict[Dimension, List[EvalInstance]]:
         """Extract evaluation instances for evaluated dimensions.
 
@@ -84,7 +85,7 @@ class GTExtractor:
         log.info("Extracting D4: Permission management instances...")
         results[Dimension.D4_PERMISSION] = d4_permission.generate_instances(
             corpus, max_instances=max_per_dimension, llm_client=self.llm_client,
-            layer_weights=self.graph_layer_weights,
+            layer_weights=self.graph_layer_weights, probes=d6_probes,
         )
 
         # D5: Cloze-deletion fidelity

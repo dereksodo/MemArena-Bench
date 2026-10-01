@@ -683,6 +683,11 @@ def _profile_to_skeleton(profile: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+# Persona cards whose JSON does not parse are generated again this many times.
+PERSONA_PARSE_RETRIES = 2
+_PERSONA_PARSE_ERRORS = (json.JSONDecodeError, KeyError, TypeError, ValueError)
+
+
 class PersonaFactory:
     """Generate rich persona cards for simulation agents."""
 
@@ -736,12 +741,37 @@ class PersonaFactory:
             return self._generate_placeholder_personas(n_agents, layer_assignments, assigned_names)
 
         log.info("Generating %d rich personas via LLM...", n_agents)
-        responses = self.llm_client.generate_batch(tasks)
+        responses = list(self.llm_client.generate_batch(tasks))
+
+        # A card whose JSON does not parse is generated again (up to PERSONA_PARSE_RETRIES
+        # times) instead of silently becoming a near-empty placeholder.
+        parsed: List[Optional[PersonaCard]] = [None] * len(tasks)
+        pending = list(range(len(tasks)))
+        for attempt in range(PERSONA_PARSE_RETRIES + 1):
+            if attempt:
+                log.warning("Re-generating %d persona(s) whose JSON did not parse (retry %d/%d)",
+                            len(pending), attempt, PERSONA_PARSE_RETRIES)
+                for i, resp in zip(pending, self.llm_client.generate_batch([tasks[i] for i in pending])):
+                    responses[i] = resp
+            still_failing = []
+            for i in pending:
+                profile = HINT_PROFILES[i % len(HINT_PROFILES)]
+                try:
+                    parsed[i] = self._parse_persona(responses[i], layer_assignments[i], index=i,
+                                                    hint_profile=profile, strict=True)
+                except _PERSONA_PARSE_ERRORS:
+                    still_failing.append(i)
+            pending = still_failing
+            if not pending:
+                break
+        for i in pending:
+            log.error("Persona %d still does not parse after %d retries; using a placeholder card "
+                      "(MASim validate will flag it)", i, PERSONA_PARSE_RETRIES)
+            parsed[i] = self._parse_persona(responses[i], layer_assignments[i], index=i,
+                                            hint_profile=HINT_PROFILES[i % len(HINT_PROFILES)])
 
         personas = []
-        for i, (resp, layer) in enumerate(zip(responses, layer_assignments)):
-            profile = HINT_PROFILES[i % len(HINT_PROFILES)]
-            persona = self._parse_persona(resp, layer, index=i, hint_profile=profile)
+        for i, persona in enumerate(parsed):
             persona.name = assigned_names[i]   # override LLM name with pool name
             persona.public_information = build_public_information(persona)
             personas.append(persona)
@@ -752,6 +782,7 @@ class PersonaFactory:
     def _parse_persona(
         self, response: str, layer: int, index: int,
         hint_profile: Optional[Dict[str, Any]] = None,
+        strict: bool = False,
     ) -> PersonaCard:
         """Parse LLM response into a PersonaCard, tolerating partial JSON.
 
@@ -806,7 +837,9 @@ class PersonaFactory:
             p.tech_affinity = compute_tech_affinity(p)
             p.public_information = build_public_information(p)
             return p
-        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as e:
+        except _PERSONA_PARSE_ERRORS as e:
+            if strict:
+                raise
             log.warning("Failed to parse persona %d: %s", index, e)
             fallback = PersonaCard(name=f"Agent_{index:04d}", dunbar_layer=layer)
             fallback.tech_affinity = compute_tech_affinity(fallback)
